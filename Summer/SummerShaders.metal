@@ -9,22 +9,23 @@
 #include <metal_stdlib>
 using namespace metal;
 
+struct VertexIn {
+    float2 position [[attribute(0)]];
+    float2 texCoord [[attribute(1)]];
+};
+
 struct VertexOut {
     float4 position [[position]];
     float2 texCoord;
 };
 
-vertex VertexOut vertexShader(uint vertexId [[vertex_id]], constant packed_float2* vertexData [[buffer(0)]]) {
+vertex VertexOut vertexShader(uint vertexId [[vertex_id]], constant VertexIn* vertexData [[buffer(0)]]) {
     VertexOut vert;
     
-    vert.position = float4(vertexData[vertexId * 2], 0, 1);
-    vert.texCoord = vertexData[vertexId * 2 + 1];
+    vert.position = float4(vertexData[vertexId].position, 0, 1);
+    vert.texCoord = vertexData[vertexId].texCoord;
     
     return vert;
-}
-
-fragment float4 fragmentShader(VertexOut vert [[stage_in]]) {
-    return float4(1.0, 0, 0, 1);
 }
 
 fragment float4 textureShader(VertexOut vert [[stage_in]],

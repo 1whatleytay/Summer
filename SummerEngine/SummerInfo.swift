@@ -17,6 +17,8 @@ public struct SummerInfo {
     
     public var deleteTexturesOnDealloc = false, deleteObjectsOnDealloc = false
     
+    public var subscribeToEvents = true
+    
     public var transparency = false
     
     public init() {}

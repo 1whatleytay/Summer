@@ -10,7 +10,7 @@ import Foundation
 
 public enum SummerMessage {
     case starting
-    case looping
+    case loop
     
     case outOfObjectMemory
     case outOfTextureMemory

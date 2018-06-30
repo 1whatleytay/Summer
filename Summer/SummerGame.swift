@@ -41,16 +41,16 @@ class SummerGame: SummerProgram {
     }
     
     func update() {
-        myObject.move(x: 1, y: myObject.x * myObject.x)
+        if engine.isKeyPressed(key: 13) { mySecondObject.y -= 2 }
+        if engine.isKeyPressed(key: 0) { mySecondObject.x -= 2 }
+        if engine.isKeyPressed(key: 1) { mySecondObject.y += 2 }
+        if engine.isKeyPressed(key: 2) { mySecondObject.x += 2 }
+        mySecondObject.save()
     }
     
-    func message(message: SummerMessage) {
-        switch message {
-        default: break
-        }
-    }
+    func message(message: SummerMessage) { }
     
-    func key() {
-        
-    }
+    func key(key: UInt16, characters: String?, state: SummerInputState) { }
+    
+    func mouse(button: SummerMouseButton, x: Double, y: Double, state: SummerInputState) { }
 }
