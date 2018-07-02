@@ -28,16 +28,12 @@ class SummerGame: SummerProgram {
     func setup(engine: SummerEngine) {
         self.engine = engine
         
-        let texData: [Float] = [
-            0, 0, 1, 1, 1, 1, 0, 0.5,
-            1, 0, 0, 0.5, 0, 1, 0, 0.5,
-        ]
-        
-        colorRed = engine.makeTexture(width: 2, height: 2, data: texData)
+        colorRed = engine.makeTexture(fromFile: "fourty.png", .inBundle)
+        if colorRed == nil { exit(1) }
         colorBlue = engine.makeColor(red: 0, green: 0, blue: 1, alpha: 1)
         
-        mySecondObject = engine.makeObject(x: 400, y: 400, width: 20, height: 20, texture: colorBlue)
-        myObject = engine.makeObject(x: 0, y: 0, width: 300, height: 300, texture: colorRed)
+        myObject = engine.makeObject(x: 400, y: 400, width: 20, height: 20, texture: colorBlue)
+        mySecondObject = engine.makeObject(x: 0, y: 0, width: 300, height: 300, texture: colorRed)
     }
     
     func update() {

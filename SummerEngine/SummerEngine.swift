@@ -13,15 +13,17 @@ import Metal
 import MetalKit
 
 /*
- Things that have been finished:
+ Finished things:
     - Key Input
     - Mouse Input (clicks)
     - Mouse Movement
     - Listen Keys (check if key is pressed)
- 
- Things to add before catching up to SEEarly4:
-    - Mouse Capture
     - Asset Loading
+ 
+ Things I gave up on:
+    - Mouse Capture
+ 
+ SEEarly4 ✔
  
  Cool Features:
     - Buttons
@@ -55,8 +57,12 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     internal var textureAllocationData: [Bool]
     private var objectMaxDraw = 0
     
+    private var isAborting = false
+    public func abort() { isAborting = true }
+    
     public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) { }
-    public func draw(in view: MTKView) { render() }
+    
+    public func draw(in view: MTKView) { step() }
     
     public func setAsCurrentEngine() { SummerEngine.currentEngine = self }
     
@@ -74,7 +80,11 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         objectMaxDraw = objectAllocationData.count - maxDrawIndex
     }
     
-    private func render() {
+    private func step() {
+        if isAborting {
+            view.delegate = nil
+            return
+        }
         program.update()
         if let commandBuffer = commandQueue.makeCommandBuffer() {
             if let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: view.currentRenderPassDescriptor!) {
@@ -139,6 +149,11 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     
     public func makeTexture(width: Int, height: Int, data: [Float]) -> SummerTexture {
         return SummerTexture(self, width: width, height: height, data: data)
+    }
+    
+    public func makeTexture(fromFile file: String,
+                            _ location: SummerTexture.SummerFileLocation = .inFolder) -> SummerTexture? {
+        return SummerTexture(self, fromFile: file, location)
     }
     
     public func makeColor(red: Float, green: Float, blue: Float, alpha: Float) -> SummerTexture {

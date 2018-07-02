@@ -7,6 +7,7 @@
 //
 
 import Metal
+import AppKit
 
 public class SummerTexture {
     private let parent: SummerEngine
@@ -14,10 +15,9 @@ public class SummerTexture {
     
     public func getSize() -> [Int] { return [width, height] }
     
-    internal static func allocate(_ parent: SummerEngine, width: Int, height: Int, x findX: inout Int, y findY: inout Int) {
+    internal static func allocate(_ parent: SummerEngine, width: Int, height: Int) -> (x: Int, y: Int) {
         var found = false
-        findX = -1
-        findY = -1
+        var findX = -1, findY = -1
         
         for scanX in 0 ..< (parent.programInfo.textureAllocWidth - width + 1) {
             for scanY in 0 ..< (parent.programInfo.textureAllocHeight - height + 1) {
@@ -48,6 +48,8 @@ public class SummerTexture {
                         * parent.programInfo.textureAllocWidth] = true
             }
         }
+        
+        return (x: findX, y: findY)
     }
     
     public func sample(x: Int, y: Int, width: Int, height: Int) -> SummerTexture? {
@@ -77,16 +79,15 @@ public class SummerTexture {
     }
     
     public convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [UInt8]) {
-        var findX = 0, findY = 0
-        SummerTexture.allocate(parent, width: width, height: height, x: &findX, y: &findY)
+        let pos = SummerTexture.allocate(parent, width: width, height: height)
         
-        if findX == -1 {
+        if pos.x == -1 {
             parent.program.message(message: .outOfTextureMemory)
         } else {
-            parent.texture.replace(region: MTLRegionMake2D(findX, findY, width, height), mipmapLevel: 0, withBytes: data, bytesPerRow: width * 4)
+            parent.texture.replace(region: MTLRegionMake2D(pos.x, pos.y, width, height), mipmapLevel: 0, withBytes: data, bytesPerRow: width * 4)
         }
         
-        self.init(parent, x: findX, y: findY, width: width, height: height)
+        self.init(parent, x: pos.x, y: pos.y, width: width, height: height)
     }
     
     public convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [Float]) {
@@ -98,11 +99,59 @@ public class SummerTexture {
         self.init(parent, width: width, height: height, data: subData)
     }
     
+    public enum MyError: Error {
+        case RepsError
+    }
+    
+    public enum SummerFileLocation {
+        case inFolder
+        case inBundle
+    }
+    
+    public convenience init?(_ parent: SummerEngine, fromFile file: String, _ location: SummerFileLocation = .inFolder) {
+        var imageData: [Float]
+        var width = 0, height = 0
+        
+        if let image = location == .inFolder ? NSImage(contentsOfFile: file) : NSImage(named: file) {
+            width = Int(image.size.width)
+            height = Int(image.size.height)
+            
+            imageData = [Float](repeating: 0, count: width * height * 4)
+            
+            guard let bitmap = NSBitmapImageRep(data: image.tiffRepresentation!)
+                else {
+                    print("Could not create bitmap.")
+                    return nil
+                }
+            
+            for x in 0 ..< width {
+                for y in 0 ..< height {
+                    let color = bitmap.colorAt(x: x, y: y)!
+                    
+                    imageData[(x + y * width) * 4] = Float(color.redComponent)
+                    imageData[(x + y * width) * 4 + 1] = Float(color.greenComponent)
+                    imageData[(x + y * width) * 4 + 2] = Float(color.blueComponent)
+                    imageData[(x + y * width) * 4 + 3] = Float(color.alphaComponent)
+                }
+            }
+            image.recache()
+        } else {
+            print("Could not load image file.")
+            return nil
+        }
+        
+        self.init(parent, width: width, height: height, data: imageData)
+    }
+    
     public convenience init(width: Int, height: Int, data: [UInt8]) {
         self.init(SummerEngine.currentEngine!, width: width, height: height, data: data)
     }
     
     public convenience init(width: Int, height: Int, data: [Float]) {
         self.init(SummerEngine.currentEngine!, width: width, height: height, data: data)
+    }
+    
+    public convenience init?(fromFile file: String, _ location: SummerFileLocation = .inFolder) {
+        self.init(SummerEngine.currentEngine!, fromFile: file, location)
     }
 }

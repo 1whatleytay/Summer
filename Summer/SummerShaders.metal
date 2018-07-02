@@ -33,4 +33,3 @@ fragment float4 textureShader(VertexOut vert [[stage_in]],
                               sampler sam [[sampler(0)]]) {
     return tex.sample(sam, vert.texCoord);
 }
-//hello my name is azhaararraararrrararaarara and welcome to my waffle house we are currently serving spaghet.

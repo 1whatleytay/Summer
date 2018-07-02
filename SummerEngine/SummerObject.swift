@@ -18,8 +18,8 @@ public class SummerObject {
     public var x, y, width, height: Float
     public var texture: SummerTexture
     
-    public static func allocate(_ parent: SummerEngine, object indexFind: inout Int) {
-        indexFind = -1
+    public static func allocate(_ parent: SummerEngine) -> Int {
+        var indexFind = -1
         for (index, alloc) in parent.objectAllocationData.enumerated() {
             if !alloc {
                 indexFind = index
@@ -27,6 +27,8 @@ public class SummerObject {
                 break
             }
         }
+        
+        return indexFind
     }
     
     private func objectData() -> [Float] {
@@ -112,8 +114,7 @@ public class SummerObject {
     }
     
     public convenience init(_ parent: SummerEngine, x: Float, y: Float, width: Float, height: Float, texture: SummerTexture) {
-        var objectId = -1
-        SummerObject.allocate(parent, object: &objectId)
+        let objectId = SummerObject.allocate(parent)
         if objectId == -1 { parent.program.message(message: .outOfObjectMemory) }
         parent.calculateMaxRenderDraw()
         self.init(parent, objectId: objectId,
