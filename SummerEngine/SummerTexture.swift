@@ -12,8 +12,9 @@ import AppKit
 public class SummerTexture {
     private let parent: SummerEngine
     internal let x, y, width, height: Int
+    internal let vertX1, vertX2, vertY1, vertY2: Float
     
-    public func getSize() -> [Int] { return [width, height] }
+    public func getSize() -> (width: Int, height: Int) { return (width: width, height: height) }
     
     internal static func allocate(_ parent: SummerEngine, width: Int, height: Int) -> (x: Int, y: Int) {
         var found = false
@@ -76,6 +77,11 @@ public class SummerTexture {
         self.y = y
         self.width = width
         self.height = height
+        
+        self.vertX1 = Float(x) / Float(parent.programInfo.textureAllocWidth)
+        self.vertX2 = Float(x + width) / Float(parent.programInfo.textureAllocWidth)
+        self.vertY1 = Float(y) / Float(parent.programInfo.textureAllocHeight)
+        self.vertY2 = Float(y + height) / Float(parent.programInfo.textureAllocHeight)
     }
     
     public convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [UInt8]) {
@@ -141,17 +147,5 @@ public class SummerTexture {
         }
         
         self.init(parent, width: width, height: height, data: imageData)
-    }
-    
-    public convenience init(width: Int, height: Int, data: [UInt8]) {
-        self.init(SummerEngine.currentEngine!, width: width, height: height, data: data)
-    }
-    
-    public convenience init(width: Int, height: Int, data: [Float]) {
-        self.init(SummerEngine.currentEngine!, width: width, height: height, data: data)
-    }
-    
-    public convenience init?(fromFile file: String, _ location: SummerFileLocation = .inFolder) {
-        self.init(SummerEngine.currentEngine!, fromFile: file, location)
     }
 }

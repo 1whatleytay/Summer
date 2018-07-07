@@ -19,7 +19,8 @@ struct VertexOut {
     float2 texCoord;
 };
 
-vertex VertexOut vertexShader(uint vertexId [[vertex_id]], constant VertexIn* vertexData [[buffer(0)]]) {
+vertex VertexOut vertexShader(uint vertexId [[vertex_id]],
+                              constant VertexIn* vertexData [[buffer(0)]]) {
     VertexOut vert;
     
     vert.position = float4(vertexData[vertexId].position, 0, 1);

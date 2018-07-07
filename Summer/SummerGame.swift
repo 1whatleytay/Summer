@@ -12,11 +12,9 @@ import SummerEngine
 class SummerGame: SummerProgram {
     var engine: SummerEngine!
     
-    var colorRed: SummerTexture!
-    var colorBlue: SummerTexture!
+    var colorRed, colorBlue, colorGreen: SummerTexture!
     
-    var myObject: SummerObject!
-    var mySecondObject: SummerObject!
+    var red, green, blue: SummerObject!
     
     func info() -> SummerInfo {
         var info = SummerInfo()
@@ -29,19 +27,24 @@ class SummerGame: SummerProgram {
         self.engine = engine
         
         colorRed = engine.makeTexture(fromFile: "fourty.png", .inBundle)
-        if colorRed == nil { exit(1) }
         colorBlue = engine.makeColor(red: 0, green: 0, blue: 1, alpha: 1)
+        colorGreen = engine.makeColor(red: 0, green: 1, blue: 0, alpha: 1)
         
-        myObject = engine.makeObject(x: 400, y: 400, width: 20, height: 20, texture: colorBlue)
-        mySecondObject = engine.makeObject(x: 0, y: 0, width: 300, height: 300, texture: colorRed)
+        red = engine.makeObject(x: 50, y: 50, width: 500, height: 500, texture: colorRed).withDraw()
+        blue = engine.makeObject(x: 150, y: 150, width: 300, height: 300, texture: colorBlue).withDraw()
+        green = engine.makeObject(x: 250, y: 250, width: 100, height: 100, texture: colorGreen).withDraw()
+        
+        blue.draw.moveForward()
+        
+        green.draw.moveBehind(draw: red.draw)
     }
     
     func update() {
-        if engine.isKeyPressed(key: 13) { mySecondObject.y -= 2 }
-        if engine.isKeyPressed(key: 0) { mySecondObject.x -= 2 }
-        if engine.isKeyPressed(key: 1) { mySecondObject.y += 2 }
-        if engine.isKeyPressed(key: 2) { mySecondObject.x += 2 }
-        mySecondObject.save()
+        if engine.isKeyPressed(key: 13) { blue.y -= 2 }
+        if engine.isKeyPressed(key: 0) { blue.x -= 2 }
+        if engine.isKeyPressed(key: 1) { blue.y += 2 }
+        if engine.isKeyPressed(key: 2) { blue.x += 2 }
+        blue.save()
     }
     
     func message(message: SummerMessage) { }

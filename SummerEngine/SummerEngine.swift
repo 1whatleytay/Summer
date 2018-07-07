@@ -19,6 +19,7 @@ import MetalKit
     - Mouse Movement
     - Listen Keys (check if key is pressed)
     - Asset Loading
+    - Draw Groups (to replace maxDraw)
  
  Things I gave up on:
     - Mouse Capture
@@ -30,7 +31,6 @@ import MetalKit
     - Tilesets (Seperate texture)
     - Animation Groups (Part of the main texture)
     - Maps (Tiled maps w/ tileset)
-    - Draw Groups (to replace maxDraw)
     - Matrix Movement
     - Offsets
  
@@ -39,8 +39,6 @@ import MetalKit
     - Screen size parameter to program info should be added (setScreensize() for units too?)
  */
 public class SummerEngine : NSObject, MTKViewDelegate {
-    internal static var currentEngine: SummerEngine?
-    
     internal let program: SummerProgram
     internal let programInfo: SummerInfo
     private let view: SummerView
@@ -55,30 +53,15 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     
     internal var objectAllocationData: [Bool]
     internal var textureAllocationData: [Bool]
-    private var objectMaxDraw = 0
+    
+    internal var objectGlobalDraw: SummerDraw!
+    internal let objectDraws = LinkedList<SummerDraw>()
     
     private var isAborting = false
     public func abort() { isAborting = true }
     
     public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) { }
-    
     public func draw(in view: MTKView) { step() }
-    
-    public func setAsCurrentEngine() { SummerEngine.currentEngine = self }
-    
-    internal func calculateMaxRenderDraw() {
-        var maxDrawIndex = objectAllocationData.count
-        for (index, alloc) in objectAllocationData.reversed().enumerated() {
-            if alloc {
-                maxDrawIndex = index
-                break
-            }
-        }
-        
-        print("Max Render Value: \(objectAllocationData.count - maxDrawIndex)")
-        
-        objectMaxDraw = objectAllocationData.count - maxDrawIndex
-    }
     
     private func step() {
         if isAborting {
@@ -92,7 +75,8 @@ public class SummerEngine : NSObject, MTKViewDelegate {
                 renderEncoder.setVertexBuffer(objectBuffer, offset: 0, index: 0)
                 renderEncoder.setFragmentTexture(texture, index: 0)
                 renderEncoder.setFragmentSamplerState(samplerState, index: 0)
-                renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: SummerObject.objectVertices * objectMaxDraw)
+                objectGlobalDraw.addDraws(encoder: renderEncoder)
+                for draw in objectDraws { draw.addDraws(encoder: renderEncoder) }
                 renderEncoder.endEncoding()
             }
             commandBuffer.present(view.currentDrawable!)
@@ -100,7 +84,6 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         }
     }
     
-    // Swift will automatically extend array if needed.
     private var keyStates = [SummerInputState](repeating: .released, count: 400)
     
     public func getKeyState(key: UInt16) -> SummerInputState {
@@ -159,6 +142,8 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     public func makeColor(red: Float, green: Float, blue: Float, alpha: Float) -> SummerTexture {
         return SummerTexture(self, width: 1, height: 1, data: [red, green, blue, alpha])
     }
+    
+    public func makeDraw() -> SummerDraw { return SummerDraw(self) }
     
     public init(_ nProgram: SummerProgram, view nView: SummerView) throws {
         program = nProgram
@@ -224,9 +209,12 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         textureAllocationData = [Bool](repeating: false, count: programInfo.textureAllocWidth * programInfo.textureAllocHeight)
         if texture == nil { throw SummerError.cannotCreateTexture }
         
+        objectGlobalDraw = SummerDraw(nil)
+        
         super.init()
         
         if !view.setEngine(engine: self) { throw SummerError.viewInUse }
+        
         program.setup(engine: self)
         program.message(message: .loop)
     }
