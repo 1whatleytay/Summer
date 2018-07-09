@@ -19,11 +19,24 @@ struct VertexOut {
     float2 texCoord;
 };
 
+struct Transform {
+    float2x2 matrix;
+    float2 offset;
+    float2 origin;
+};
+
 vertex VertexOut vertexShader(uint vertexId [[vertex_id]],
-                              constant VertexIn* vertexData [[buffer(0)]]) {
+                              constant VertexIn* vertexData [[buffer(0)]],
+                              constant Transform* transforms [[buffer(1)]],
+                              constant uint* pivot [[buffer(2)]]) {
     VertexOut vert;
     
-    vert.position = float4(vertexData[vertexId].position, 0, 1);
+    Transform t = transforms[pivot[vertexId / 6]];
+    
+    vert.position = float4(t.matrix *
+                           (vertexData[vertexId].position - t.origin)
+                           + t.origin + t.offset
+                           , 0, 1);
     vert.texCoord = vertexData[vertexId].texCoord;
     
     return vert;

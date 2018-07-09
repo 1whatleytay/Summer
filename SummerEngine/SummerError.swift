@@ -14,6 +14,8 @@ public enum SummerError: Error {
     case noDefaultLibrary
     case cannotCreatePipelineState
     case cannotCreateObjectBuffer
+    case cannotCreateTransformBuffer
+    case cannotCreatePivotBuffer
     case cannotCreateTexture
     case viewInUse
 }

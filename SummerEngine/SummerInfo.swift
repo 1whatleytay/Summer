@@ -10,6 +10,7 @@ public struct SummerInfo {
     public var name = "Summer Program"
     
     public var maxObjects = 200
+    public var maxTransforms = 60
     public var textureAllocWidth = 1000, textureAllocHeight = 1000
     
     public var verticalUnit: Float = 1/600, horizontalUnit: Float = 1/600

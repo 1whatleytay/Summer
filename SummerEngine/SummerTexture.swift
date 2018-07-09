@@ -140,7 +140,6 @@ public class SummerTexture {
                     imageData[(x + y * width) * 4 + 3] = Float(color.alphaComponent)
                 }
             }
-            image.recache()
         } else {
             print("Could not load image file.")
             return nil

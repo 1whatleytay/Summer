@@ -9,16 +9,19 @@
 import Cocoa
 
 public class SummerObject {
-    internal static let objectVertices = 6
-    internal static let objectSize = MemoryLayout<Float>.size * objectVertices * 4
+    internal static let vertices = 6
+    internal static let size = MemoryLayout<Float>.size * vertices * 4
     
     private let parent: SummerEngine
     private var objectId: Int
+    
+    internal var modified = false
     
     public var x, y, width, height: Float
     public var texture: SummerTexture
     
     public private(set) var draw: SummerDraw
+    public private(set) var transform: SummerTransform
     
     public static func allocate(_ parent: SummerEngine) -> Int {
         var indexFind = -1
@@ -49,15 +52,22 @@ public class SummerObject {
         ]
     }
     
-    internal func save(data: [Float]) {
+    public func save() {
         if objectId == -1 { return }
         
         parent.objectBuffer.contents()
-            .advanced(by: objectId * SummerObject.objectSize)
-            .copyMemory(from: data, byteCount: SummerObject.objectSize)
+            .advanced(by: objectId * SummerObject.size)
+            .copyMemory(from: objectData(), byteCount: SummerObject.size)
     }
     
-    public func swapDraws(draw newDraw: SummerDraw) {
+    public func commit() {
+        if !modified {
+            parent.addObjectModify(self)
+            modified = true
+        }
+    }
+    
+    public func setDraw(to newDraw: SummerDraw) {
         draw.removeIndex(index: objectId)
         
         newDraw.addIndex(index: objectId)
@@ -66,15 +76,9 @@ public class SummerObject {
     
     @discardableResult public func makeDraw() -> SummerDraw {
         let newDraw = SummerDraw(parent)
-        swapDraws(draw: newDraw)
+        setDraw(to: newDraw)
         
         return newDraw
-    }
-    
-    public func withDraw(draw newDraw: SummerDraw) -> SummerObject {
-        swapDraws(draw: newDraw)
-        
-        return self
     }
     
     public func withDraw() -> SummerObject {
@@ -83,38 +87,55 @@ public class SummerObject {
         return self
     }
     
-    public func save() {
-        save(data: objectData())
+    public func setTransform(to newTransform: SummerTransform) {
+        newTransform.pivot(objectId: objectId)
+        
+        transform = newTransform
+    }
+    
+    @discardableResult public func makeTransform() -> SummerTransform {
+        let newTransform = SummerTransform(parent)
+        setTransform(to: newTransform)
+        
+        return newTransform
+    }
+    
+    public func withTransform(transform newTransform: SummerTransform) -> SummerObject {
+        setTransform(to: newTransform)
+        
+        return self
+    }
+    
+    public func withTransform() -> SummerObject {
+        return withTransform(transform: SummerTransform(parent))
     }
     
     public func texture(_ texture: SummerTexture)  {
         self.texture = texture
-        save()
+        commit()
     }
     
     public func size(width: Float, height: Float) {
         self.width = width
         self.height = height
-        save()
+        commit()
     }
     
     public func put(x: Float, y: Float) {
         self.x = x
         self.y = y
-        save()
+        commit()
     }
     
     public func move(x: Float, y: Float) {
         self.x += x
         self.y += y
-        save()
+        commit()
     }
     
     public func delete() {
-        print("Deleting object: \(objectId)")
         if objectId == -1 { return }
         
-        //save(data: [Float](repeating: 0, count: SummerObject.objectVertices * 2))
         draw.removeIndex(index: objectId)
         parent.objectAllocationData[objectId] = false
         objectId = -1
@@ -122,7 +143,12 @@ public class SummerObject {
     
     deinit { if parent.programInfo.deleteObjectsOnDealloc { delete() } }
     
-    internal init(_ parent: SummerEngine, objectId: Int, draw: SummerDraw, x: Float, y: Float, width: Float, height: Float, texture: SummerTexture) {
+    private init(_ parent: SummerEngine, objectId: Int,
+                 draw: SummerDraw,
+                 transform: SummerTransform,
+                 x: Float, y: Float,
+                 width: Float, height: Float,
+                 texture: SummerTexture) {
         self.parent = parent
         self.objectId = objectId
         
@@ -134,14 +160,17 @@ public class SummerObject {
         self.texture = texture
         
         self.draw = draw
-        
         draw.addIndex(index: objectId)
         
-        save()
+        self.transform = parent.globalTransform
+        transform.pivot(objectId: objectId)
+        
+        commit()
     }
     
     public convenience init(_ parent: SummerEngine,
                             draw: SummerDraw,
+                            transform: SummerTransform,
                             x: Float, y: Float,
                             width: Float, height: Float,
                             texture: SummerTexture) {
@@ -151,6 +180,33 @@ public class SummerObject {
         
         self.init(parent, objectId: objectId,
                   draw: draw,
+                  transform: transform,
+                  x: x, y: y,
+                  width: width, height: height,
+                  texture: texture)
+    }
+    
+    public convenience init(_ parent: SummerEngine,
+                            draw: SummerDraw,
+                            x: Float, y: Float,
+                            width: Float, height: Float,
+                            texture: SummerTexture) {
+        self.init(parent,
+                  draw: draw,
+                  transform: parent.globalTransform,
+                  x: x, y: y,
+                  width: width, height: height,
+                  texture: texture)
+    }
+    
+    public convenience init(_ parent: SummerEngine,
+                            transform: SummerTransform,
+                            x: Float, y: Float,
+                            width: Float, height: Float,
+                            texture: SummerTexture) {
+        self.init(parent,
+                  draw: parent.globalDraw,
+                  transform: transform,
                   x: x, y: y,
                   width: width, height: height,
                   texture: texture)
@@ -161,7 +217,8 @@ public class SummerObject {
                             width: Float, height: Float,
                             texture: SummerTexture) {
         self.init(parent,
-                  draw: parent.objectGlobalDraw,
+                  draw: parent.globalDraw,
+                  transform: parent.globalTransform,
                   x: x, y: y,
                   width: width, height: height,
                   texture: texture)

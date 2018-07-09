@@ -13,5 +13,6 @@ public enum SummerMessage {
     case loop
     
     case outOfObjectMemory
+    case outOfTransformMemory
     case outOfTextureMemory
 }

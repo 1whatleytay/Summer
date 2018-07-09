@@ -98,7 +98,7 @@ public class SummerDraw {
         }
     }
     
-    public func addObject(object: SummerObject) { object.swapDraws(draw: self) }
+    public func addObject(object: SummerObject) { object.setDraw(to: self) }
     
     public func makeObject(
         x: Float, y: Float,
@@ -181,8 +181,8 @@ public class SummerDraw {
     internal func addDraws(encoder: MTLRenderCommandEncoder) {
         for range in ranges {
             encoder.drawPrimitives(type: .triangle,
-                                         vertexStart: range.start * SummerObject.objectVertices,
-                                         vertexCount: range.count * SummerObject.objectVertices)
+                                         vertexStart: range.start * SummerObject.vertices,
+                                         vertexCount: range.count * SummerObject.vertices)
         }
     }
     
