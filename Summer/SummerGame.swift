@@ -33,6 +33,9 @@ class SummerGame: SummerProgram {
         red = engine.makeObject(x: 50, y: 50, width: 500, height: 500, texture: colorRed).withTransform()
         blue = engine.makeObject(x: 150, y: 150, width: 300, height: 300, texture: colorBlue)
         green = engine.makeObject(x: 250, y: 250, width: 100, height: 100, texture: colorGreen)
+        
+        red.transform.moveOffset(x: 100, y: 0)
+        red.transform.setOrigin(x: 100, y: 100)
     }
     
     func update() {
