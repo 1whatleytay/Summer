@@ -22,32 +22,33 @@ import MetalKit
     - Draw Groups (to replace maxDraw)
     - Matrix Movement
     - Offsets
+    - Key Codes in Package (from Carbon)
+    - Swap Programs
  
  Things I gave up on:
     - Mouse Capture
- 
- SEEarly4 ✔
  
  Cool Features:
     - Buttons
     - Tilesets (Seperate texture)
     - Animation Groups (Part of the main texture)
     - Maps (Tiled maps w/ tileset)
-    - Swap Programs
-    - Key Codes in Package (from Carbon)
     - Documentation
  
  Fixes:
     - Mouse flipping should not be using Units (exclusively, mostly Amps) and should be applied to x and y
     - Screen size parameter to program info should be added (setScreensize() for units too?)
  */
+
 public class SummerEngine : NSObject, MTKViewDelegate {
-    internal let program: SummerProgram
-    internal let programInfo: SummerInfo
+    internal var program: SummerProgram
+    public var settings: SummerSettings
+    public let features: SummerFeatures
     private let view: SummerView
     
     private let device: MTLDevice!
     private let commandQueue: MTLCommandQueue!
+    
     internal let objectBuffer: MTLBuffer!
     internal let transformBuffer: MTLBuffer!
     internal let pivotBuffer: MTLBuffer!
@@ -68,7 +69,10 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     internal let objectDraws = LinkedList<SummerDraw>()
     
     private var isAborting = false
-    public func abort() { isAborting = true }
+    public func abort() {
+        program.message(message: .aborting)
+        isAborting = true
+    }
     
     internal func addObjectModify(_ object: SummerObject) { objectModifyQueue.append(object) }
     internal func addTransformModify(_ transform: SummerTransform) { transformModifyQueue.append(transform) }
@@ -79,7 +83,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
             object.modified = false
         }
         
-        objectModifyQueue.removeAll(keepingCapacity: true)
+        objectModifyQueue.removeAll(keepingCapacity: !settings.conserveModifyMemory)
     }
     
     private func dequeueTransformModifies() {
@@ -88,7 +92,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
             transform.modified = false
         }
         
-        transformModifyQueue.removeAll(keepingCapacity: true)
+        transformModifyQueue.removeAll(keepingCapacity: !settings.conserveModifyMemory)
     }
     
     private func dequeueModifies() {
@@ -123,7 +127,79 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         }
     }
     
-    private var keyStates = [SummerInputState](repeating: .released, count: 400)
+    public func autoDetectDisplaySize() {
+        settings.displayWidth = Int(view.drawableSize.width) / 2
+        settings.displayHeight = Int(view.drawableSize.height) / 2
+    }
+    
+    public func autoDetectUnitSize() {
+        settings.horizontalUnit = 1 / (Float(view.drawableSize.width) / 2)
+        settings.verticalUnit = 1 / (Float(view.drawableSize.height) / 2)
+    }
+    
+    public func deleteEmptyDraws() {
+        for (i, draw) in objectDraws.enumerated() {
+            if draw.isEmpty() {
+                objectDraws.remove(at: i)
+            }
+        }
+    }
+    
+    private func freeAllocations() {
+        objectAllocationData = [Bool](repeating: false, count: features.maxObjects)
+        transformAllocationData = [Bool](repeating: false, count: features.maxTransforms)
+        textureAllocationData = [Bool](repeating: false,
+                                       count: features.textureAllocWidth * features.textureAllocHeight)
+        
+        globalDraw = SummerDraw(nil)
+        globalTransform = SummerTransform(self)
+        objectDraws.removeAll()
+    }
+    
+    @discardableResult public func swapPrograms(_ newProgram: SummerProgram, keepResources: Bool = false) -> SummerProgram {
+        let oldProgram = program
+        
+        if !keepResources { freeAllocations() }
+        
+        if features.clearSettingsOnProgramSwap { settings = SummerSettings() }
+        
+        program = newProgram
+        program.message(message: .swapping)
+        program.setup(engine: self)
+        
+        return oldProgram
+    }
+    
+    @discardableResult public func swapPrograms(_ newProgram: SummerProgram,
+                                                keepObjects: [SummerObject],
+                                                keepTextures: [SummerTexture] = [],
+                                                keepDraws: [SummerDraw] = [],
+                                                keepTransforms: [SummerTransform] = []) -> SummerProgram{
+        freeAllocations()
+        
+        for texture in keepTextures { texture.allocate() }
+        for object in keepObjects {
+            object.allocate()
+            object.texture.allocate()
+            // Kou-chan will remember this.
+            if object.transform.isGlobal {
+                object.setTransform(to: globalTransform)
+            } else {
+                object.transform.allocate()
+            }
+            if object.draw.isGlobal {
+                globalDraw.addObject(object: object)
+            } else {
+                objectDraws.append(object.draw)
+            }
+        }
+        for draw in keepDraws { objectDraws.append(draw) }
+        for transform in keepTransforms { transform.allocate() }
+        
+        return swapPrograms(newProgram, keepResources: true)
+    }
+    
+    private var keyStates = [SummerInputState](repeating: .released, count: 0xFF)
     
     public func getKeyState(key: UInt16) -> SummerInputState {
         if keyStates.count <= key { return .released }
@@ -136,7 +212,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     
     internal func keyChanged(key: UInt16, characters: String?, state: SummerInputState) {
         keyStates[Int(key)] = state
-        program.key(key: key, characters: characters, state: state)
+        program.key(key: SummerKey(rawValue: key) ?? .vkUnknown, characters: characters, state: state)
     }
     
     internal func mouseButtonChanged(button: SummerMouseButton,
@@ -144,14 +220,14 @@ public class SummerEngine : NSObject, MTKViewDelegate {
                                      state: SummerInputState) {
         program.mouse(button: button,
                       x: x,
-                      y: 1 / Double(programInfo.verticalUnit) - y,
+                      y: Double(settings.displayHeight) - y,
                       state: state)
     }
     
     internal func mouseMoved(x: Double, y: Double) {
         program.mouse(button: .movement,
                       x: x,
-                      y: 1 / Double(programInfo.verticalUnit) - y,
+                      y: Double(settings.displayHeight) - y,
                       state: .movement)
     }
     
@@ -178,6 +254,10 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         return SummerTexture(self, fromFile: file, location)
     }
     
+    public func makeTexture(fromFile file: String) -> SummerTexture? {
+        return SummerTexture(self, fromFile: file)
+    }
+    
     public func makeColor(red: Float, green: Float, blue: Float, alpha: Float) -> SummerTexture {
         return SummerTexture(self, width: 1, height: 1, data: [red, green, blue, alpha])
     }
@@ -185,9 +265,12 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     public func makeDraw() -> SummerDraw { return SummerDraw(self) }
     public func makeTransform() -> SummerTransform { return SummerTransform(self) }
     
-    public init(_ nProgram: SummerProgram, view nView: SummerView) throws {
+    public init(_ nProgram: SummerProgram,
+                view nView: SummerView,
+                features nFeatures: SummerFeatures = SummerFeatures()) throws {
         program = nProgram
-        programInfo = program.info()
+        features = nFeatures
+        settings = SummerSettings()
         view = nView
         
         program.message(message: .starting)
@@ -205,7 +288,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
             pipelineDescriptor.fragmentFunction = library.makeFunction(name: "textureShader")!
         } else { throw SummerError.noDefaultLibrary }
         pipelineDescriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat
-        if programInfo.transparency {
+        if features.transparency {
             pipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
             pipelineDescriptor.colorAttachments[0].rgbBlendOperation = .add
             pipelineDescriptor.colorAttachments[0].alphaBlendOperation = .add
@@ -234,33 +317,41 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         samplerDescriptor.tAddressMode = .repeat
         samplerState = device.makeSamplerState(descriptor: samplerDescriptor)!
         
-        objectBuffer = device.makeBuffer(length: SummerObject.size * programInfo.maxObjects)
+        objectBuffer = device.makeBuffer(length: SummerObject.size * features.maxObjects)
         if objectBuffer == nil { throw SummerError.cannotCreateObjectBuffer }
-        transformBuffer = device.makeBuffer(length: SummerTransform.size * programInfo.maxTransforms)
+        
+        transformBuffer = device.makeBuffer(length: SummerTransform.size * features.maxTransforms,
+                                            options: features.staticTransform ? .storageModeManaged : .storageModeShared)
         if transformBuffer == nil { throw SummerError.cannotCreateTransformBuffer }
-        pivotBuffer = device.makeBuffer(length: programInfo.maxObjects * SummerTransform.pivotSize)
+        
+        pivotBuffer = device.makeBuffer(length: features.maxObjects * SummerTransform.pivotSize,
+                                        options: features.staticPivot ? .storageModeManaged : .storageModeShared)
         if pivotBuffer == nil { throw SummerError.cannotCreatePivotBuffer }
-        objectAllocationData = [Bool](repeating: false, count: programInfo.maxObjects)
-        transformAllocationData = [Bool](repeating: false, count: programInfo.maxTransforms)
         
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: MTLPixelFormat.rgba8Unorm,
-            width: programInfo.textureAllocWidth, height: programInfo.textureAllocHeight,
+            width: features.textureAllocWidth, height: features.textureAllocHeight,
             mipmapped: false)
         
         texture = device.makeTexture(descriptor: textureDescriptor)
-        textureAllocationData = [Bool](repeating: false, count: programInfo.textureAllocWidth * programInfo.textureAllocHeight)
         if texture == nil { throw SummerError.cannotCreateTexture }
         
-        globalDraw = SummerDraw(nil)
+        objectAllocationData = [Bool](repeating: false, count: features.maxObjects)
+        transformAllocationData = [Bool](repeating: false, count: features.maxTransforms)
+        textureAllocationData = [Bool](repeating: false,
+                                       count: features.textureAllocWidth * features.textureAllocHeight)
         
         super.init()
         
-        globalTransform = makeTransform()
+        globalDraw = SummerDraw(nil)
+        globalTransform = SummerTransform(self, isGlobal: true)
         
         if !view.setEngine(engine: self) { throw SummerError.viewInUse }
         
+        autoDetectDisplaySize()
+        autoDetectUnitSize()
+        
         program.setup(engine: self)
-        program.message(message: .loop)
+        program.message(message: .looping)
     }
 }

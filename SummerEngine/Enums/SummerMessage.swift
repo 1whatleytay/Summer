@@ -10,8 +10,11 @@ import Foundation
 
 public enum SummerMessage {
     case starting
-    case loop
+    case looping
+    case swapping
+    case aborting
     
+    case couldNotFindTexture
     case outOfObjectMemory
     case outOfTransformMemory
     case outOfTextureMemory

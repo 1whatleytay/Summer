@@ -25,10 +25,10 @@ public class SummerTransform {
             return [
                 matrix[0, 0], matrix[0, 1],
                 matrix[1, 0], matrix[1, 1],
-                offset.x * parent.programInfo.horizontalUnit * parent.programInfo.horizontalAmp,
-                offset.y * parent.programInfo.verticalUnit * parent.programInfo.verticalAmp,
-                (origin.x * parent.programInfo.horizontalUnit * 2 - 1) * parent.programInfo.horizontalAmp,
-                (origin.y * parent.programInfo.verticalUnit * 2 - 1) * parent.programInfo.verticalAmp,
+                offset.x * parent.settings.horizontalUnit * parent.settings.horizontalAmp,
+                offset.y * parent.settings.verticalUnit * parent.settings.verticalAmp,
+                (origin.x * parent.settings.horizontalUnit * 2 - 1) * parent.settings.horizontalAmp,
+                (origin.y * parent.settings.verticalUnit * 2 - 1) * parent.settings.verticalAmp,
             ]
         }
         
@@ -36,13 +36,14 @@ public class SummerTransform {
             self.parent = parent
             
             self.offset = float2(0, 0)
-            self.origin = float2(1 / parent.programInfo.horizontalUnit / 2,
-                                 1 / parent.programInfo.verticalUnit / 2)
+            self.origin = float2(Float(parent.settings.displayWidth) / 2,
+                                 Float(parent.settings.displayHeight) / 2)
         }
     }
     
     private let parent: SummerEngine
-    private var transformId: Int
+    private let transformId: Int
+    internal let isGlobal: Bool
     
     internal var modified = false
     
@@ -53,7 +54,6 @@ public class SummerTransform {
         for (index, alloc) in parent.transformAllocationData.enumerated() {
             if !alloc {
                 indexFind = index
-                parent.transformAllocationData[index] = true
                 break
             }
         }
@@ -61,12 +61,24 @@ public class SummerTransform {
         return indexFind
     }
     
+    internal func allocate() {
+        if parent.settings.debugPrintAllocationMessages {
+            print("Allocated transform: \(transformId)")
+        }
+        parent.transformAllocationData[transformId] = true
+    }
+    
     public func save() {
         if transformId == -1 { return }
         
+        let start = transformId * SummerTransform.size
+        let end = transformId * SummerTransform.size + SummerTransform.size
+        
         parent.transformBuffer.contents()
-            .advanced(by: transformId * SummerTransform.size)
+            .advanced(by: start)
             .copyMemory(from: data.data(), byteCount: SummerTransform.size)
+        
+        if parent.features.staticTransform { parent.transformBuffer.didModifyRange(start..<end) }
     }
     
     public func commit() {
@@ -77,9 +89,14 @@ public class SummerTransform {
     }
     
     public func pivot(objectId: Int) {
+        let start = objectId * SummerTransform.pivotSize
+        let end = objectId * SummerTransform.pivotSize + SummerTransform.pivotSize
+        
         parent.pivotBuffer.contents()
-            .advanced(by: objectId * SummerTransform.pivotSize)
+            .advanced(by: start)
             .copyMemory(from: [transformId], byteCount: SummerTransform.pivotSize)
+        
+        if parent.features.staticPivot { parent.pivotBuffer.didModifyRange(start..<end) }
     }
     
     public func change(matrix: simd_float2x2) {
@@ -148,22 +165,24 @@ public class SummerTransform {
         if transformId == -1 { return }
         
         parent.transformAllocationData[transformId] = false
-        transformId = -1
     }
     
-    private init(_ parent: SummerEngine, transformId: Int) {
+    deinit { if parent.settings.deleteTransformsOnDealloc { delete() } }
+    
+    private init(_ parent: SummerEngine, transformId: Int, isGlobal: Bool) {
         self.parent = parent
         self.transformId = transformId
+        self.isGlobal = isGlobal
         
         self.data = TransformData(parent)
         
         commit()
     }
     
-    internal convenience init(_ parent: SummerEngine) {
+    internal convenience init(_ parent: SummerEngine, isGlobal: Bool = false) {
         let transformId = SummerTransform.allocate(parent)
         if transformId == -1 { parent.program.message(message: .outOfTransformMemory) }
         
-        self.init(parent, transformId: transformId)
+        self.init(parent, transformId: transformId, isGlobal: isGlobal)
     }
 }

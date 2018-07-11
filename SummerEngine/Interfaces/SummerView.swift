@@ -104,7 +104,7 @@ public class SummerView: MTKView {
         if self.engine == nil {
             self.engine = engine
             self.delegate = engine
-            if engine.programInfo.subscribeToEvents { self.subscribeToEvents() }
+            if engine.features.subscribeToEvents { self.subscribeToEvents() }
             return true
         } else {
             return false

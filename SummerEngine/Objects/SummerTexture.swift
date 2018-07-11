@@ -20,12 +20,13 @@ public class SummerTexture {
         var found = false
         var findX = -1, findY = -1
         
-        for scanX in 0 ..< (parent.programInfo.textureAllocWidth - width + 1) {
-            for scanY in 0 ..< (parent.programInfo.textureAllocHeight - height + 1) {
+        for scanX in 0 ..< (parent.features.textureAllocWidth - width + 1) {
+            for scanY in 0 ..< (parent.features.textureAllocHeight - height + 1) {
                 var isFound = false
                 for scanPX in 0 ..< width {
                     for scanPY in 0 ..< height {
-                        if parent.textureAllocationData[(scanX + scanPX) + (scanY + scanPY) * parent.programInfo.textureAllocWidth] {
+                        if parent.textureAllocationData[(scanX + scanPX) +
+                                (scanY + scanPY) * parent.features.textureAllocWidth] {
                             isFound = true
                             break
                         }
@@ -42,15 +43,20 @@ public class SummerTexture {
             if found { break }
         }
         
-        for x in 0..<width {
-            for y in 0..<height {
+        return (x: findX, y: findY)
+    }
+    
+    internal func allocate() {
+        if parent.settings.debugPrintAllocationMessages {
+            print("Allocated texture: \(x), \(y) -> (\(width), \(height))")
+        }
+        for x in 0 ..< width {
+            for y in 0 ..< height {
                 parent.textureAllocationData[
-                    (findX + x) + (findY + y)
-                        * parent.programInfo.textureAllocWidth] = true
+                    (self.x + x) + (self.y + y)
+                        * parent.features.textureAllocWidth] = true
             }
         }
-        
-        return (x: findX, y: findY)
     }
     
     public func sample(x: Int, y: Int, width: Int, height: Int) -> SummerTexture? {
@@ -63,12 +69,12 @@ public class SummerTexture {
     public func delete() {
         for sX in 0 ..< width {
             for sY in 0 ..< height {
-                parent.textureAllocationData[x + sX + (y + sY) * parent.programInfo.textureAllocWidth] = true
+                parent.textureAllocationData[x + sX + (y + sY) * parent.features.textureAllocWidth] = true
             }
         }
     }
     
-    deinit { if parent.programInfo.deleteTexturesOnDealloc { delete() } }
+    deinit { if parent.settings.deleteTexturesOnDealloc { delete() } }
     
     internal init(_ parent: SummerEngine, x: Int, y: Int, width: Int, height: Int) {
         self.parent = parent
@@ -78,10 +84,10 @@ public class SummerTexture {
         self.width = width
         self.height = height
         
-        self.vertX1 = Float(x) / Float(parent.programInfo.textureAllocWidth)
-        self.vertX2 = Float(x + width) / Float(parent.programInfo.textureAllocWidth)
-        self.vertY1 = Float(y) / Float(parent.programInfo.textureAllocHeight)
-        self.vertY2 = Float(y + height) / Float(parent.programInfo.textureAllocHeight)
+        self.vertX1 = Float(x) / Float(parent.features.textureAllocWidth)
+        self.vertX2 = Float(x + width) / Float(parent.features.textureAllocWidth)
+        self.vertY1 = Float(y) / Float(parent.features.textureAllocHeight)
+        self.vertY2 = Float(y + height) / Float(parent.features.textureAllocHeight)
     }
     
     public convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [UInt8]) {
@@ -94,6 +100,8 @@ public class SummerTexture {
         }
         
         self.init(parent, x: pos.x, y: pos.y, width: width, height: height)
+        
+        allocate()
     }
     
     public convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [Float]) {
@@ -103,10 +111,6 @@ public class SummerTexture {
         }
         
         self.init(parent, width: width, height: height, data: subData)
-    }
-    
-    public enum MyError: Error {
-        case RepsError
     }
     
     public enum SummerFileLocation {
@@ -126,7 +130,7 @@ public class SummerTexture {
             
             guard let bitmap = NSBitmapImageRep(data: image.tiffRepresentation!)
                 else {
-                    print("Could not create bitmap.")
+                    parent.program.message(message: .couldNotFindTexture)
                     return nil
                 }
             
@@ -141,10 +145,14 @@ public class SummerTexture {
                 }
             }
         } else {
-            print("Could not load image file.")
+            parent.program.message(message: .couldNotFindTexture)
             return nil
         }
         
         self.init(parent, width: width, height: height, data: imageData)
+    }
+    
+    public convenience init?(_ parent: SummerEngine, fromFile file: String) {
+        self.init(parent, fromFile: file, parent.settings.defaultTextureLocation)
     }
 }

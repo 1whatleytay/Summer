@@ -10,11 +10,9 @@ import Foundation
 import Metal
 
 public class SummerDraw {
-    public static var mergeDrawRanges = true
-    
     private let parent: SummerEngine?
     
-    private class SummerRange {
+    private struct SummerRange {
         public var start, count: Int
         public var end: Int { return start + count - 1 }
         
@@ -27,6 +25,7 @@ public class SummerDraw {
     }
     
     private var ranges = [SummerRange]()
+    internal let isGlobal: Bool
     
     private func getIndexInParent() -> Int {
         if parent == nil { return -1 }
@@ -39,34 +38,36 @@ public class SummerDraw {
     
     private func mergeConcurrentRanges(rangeIndex: Int) {
         let crange = ranges[rangeIndex]
-        for range in ranges {
+        for (i, range) in ranges.enumerated() {
             if crange.start - 1 == range.end {
-                range.count += crange.count
+                ranges[i].count += crange.count
                 ranges.remove(at: rangeIndex)
                 break
             }
         }
-        for (index, range) in ranges.enumerated() {
+        for (i, range) in ranges.enumerated() {
             if crange.end + 1 == range.start {
-                crange.count += range.count
-                ranges.remove(at: index)
+                ranges[rangeIndex].count += range.count
+                ranges.remove(at: i)
                 break
             }
         }
     }
     
+    internal func isEmpty() -> Bool { return ranges.isEmpty }
+    
     internal func addIndex(index: Int) {
         var foundRange = false
         for (i, range) in ranges.enumerated() {
             if range.start - 1 == index {
-                range.start -= 1
-                range.count += 1
-                if SummerDraw.mergeDrawRanges { mergeConcurrentRanges(rangeIndex: i) }
+                ranges[i].start -= 1
+                ranges[i].count += 1
+                if parent?.settings.mergeDrawRanges ?? true { mergeConcurrentRanges(rangeIndex: i) }
                 foundRange = true
                 break
             } else if range.end + 1 == index {
-                range.count += 1
-                if SummerDraw.mergeDrawRanges { mergeConcurrentRanges(rangeIndex: i) }
+                ranges[i].count += 1
+                if parent?.settings.mergeDrawRanges ?? true { mergeConcurrentRanges(rangeIndex: i) }
                 foundRange = true
                 break
             }
@@ -79,15 +80,15 @@ public class SummerDraw {
     internal func removeIndex(index: Int) {
         for (i, range) in ranges.enumerated() {
             if range.start == index {
-                range.count -= 1
-                range.start += 1
+                ranges[i].count -= 1
+                ranges[i].start += 1
                 if range.count <= 0 { ranges.remove(at: i) }
             } else if range.end == index {
-                range.count -= 1
+                ranges[i].count -= 1
                 if range.count <= 0 { ranges.remove(at: i) }
             } else if range.start < index && range.end > index {
                 let tempCount = range.count
-                range.count = index - range.start
+                ranges[i].count = index - range.start
                 let newRange = SummerRange(
                     start: index + 1,
                     count: tempCount - (range.count + 1)
@@ -196,6 +197,7 @@ public class SummerDraw {
     
     internal init(_ parent: SummerEngine?) {
         self.parent = parent
+        self.isGlobal = parent == nil
         
         parent?.objectDraws.append(self)
     }

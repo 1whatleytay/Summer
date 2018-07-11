@@ -11,18 +11,6 @@ import MetalKit
 import SummerEngine
 
 class SummerController: NSViewController {
-//    override public func keyUp(with event: NSEvent) {
-//        print("Oh Up")
-//    }
-//    
-//    override public func keyDown(with event: NSEvent) {
-//        print("Oh Down")
-//    }
-//    
-//    override public func performKeyEquivalent(with event: NSEvent) -> Bool {
-//        return true
-//    }
-    
     @IBOutlet var summerView: SummerView!
     
     var engine: SummerEngine!
@@ -30,8 +18,13 @@ class SummerController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        var features = SummerFeatures()
+        
+        features.staticPivot = true
+        features.staticTransform = true
+        
         do {
-            engine = try SummerEngine(SummerGame(), view: summerView)
+            engine = try SummerEngine(SummerGame(), view: summerView, features: features)
         } catch let e {
             switch e {
             case SummerError.cannotCreateDevice: print("Cannot create device!")
@@ -40,12 +33,6 @@ class SummerController: NSViewController {
             case SummerError.cannotCreatePipelineState: print("Cannot create pipeline state!")
             default: print("Too lazy to handle this error :/")
             }
-        }
-    }
-
-    override var representedObject: Any? {
-        didSet {
-        // Update the view, if already loaded.
         }
     }
 }

@@ -13,7 +13,7 @@ public class SummerObject {
     internal static let size = MemoryLayout<Float>.size * vertices * 4
     
     private let parent: SummerEngine
-    private var objectId: Int
+    private let objectId: Int
     
     internal var modified = false
     
@@ -28,7 +28,6 @@ public class SummerObject {
         for (index, alloc) in parent.objectAllocationData.enumerated() {
             if !alloc {
                 indexFind = index
-                parent.objectAllocationData[index] = true
                 break
             }
         }
@@ -36,11 +35,18 @@ public class SummerObject {
         return indexFind
     }
     
+    internal func allocate() {
+        if parent.settings.debugPrintAllocationMessages {
+            print("Allocate Object: \(objectId)")
+        }
+        parent.objectAllocationData[objectId] = true
+    }
+    
     private func objectData() -> [Float] {
-        let vertX1 = (x * parent.programInfo.horizontalUnit * 2 - 1) * parent.programInfo.horizontalAmp
-        let vertX2 = ((x + width) * parent.programInfo.horizontalUnit * 2 - 1) * parent.programInfo.horizontalAmp
-        let vertY1 = (y * parent.programInfo.verticalUnit * 2 - 1) * parent.programInfo.verticalAmp
-        let vertY2 = ((y + height) * parent.programInfo.verticalUnit * 2 - 1) * parent.programInfo.verticalAmp
+        let vertX1 = (x * parent.settings.horizontalUnit * 2 - 1) * parent.settings.horizontalAmp
+        let vertX2 = ((x + width) * parent.settings.horizontalUnit * 2 - 1) * parent.settings.horizontalAmp
+        let vertY1 = (y * parent.settings.verticalUnit * 2 - 1) * parent.settings.verticalAmp
+        let vertY2 = ((y + height) * parent.settings.verticalUnit * 2 - 1) * parent.settings.verticalAmp
         
         return [
             vertX1, vertY1, texture.vertX1, texture.vertY1,
@@ -138,10 +144,9 @@ public class SummerObject {
         
         draw.removeIndex(index: objectId)
         parent.objectAllocationData[objectId] = false
-        objectId = -1
     }
     
-    deinit { if parent.programInfo.deleteObjectsOnDealloc { delete() } }
+    deinit { if parent.settings.deleteObjectsOnDealloc { delete() } }
     
     private init(_ parent: SummerEngine, objectId: Int,
                  draw: SummerDraw,
@@ -184,6 +189,8 @@ public class SummerObject {
                   x: x, y: y,
                   width: width, height: height,
                   texture: texture)
+        
+        allocate()
     }
     
     public convenience init(_ parent: SummerEngine,
