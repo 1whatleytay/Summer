@@ -24,16 +24,20 @@ import MetalKit
     - Offsets
     - Key Codes in Package (from Carbon)
     - Swap Programs
+    - Tilesets (Seperate texture)
+    - Maps (Tiled maps w/ tileset)
  
  Things I gave up on:
     - Mouse Capture
  
  Cool Features:
     - Buttons
-    - Tilesets (Seperate texture)
     - Animation Groups (Part of the main texture)
-    - Maps (Tiled maps w/ tileset)
     - Documentation
+    - Modify Textures
+    - Default Settings by Controller
+    - Single File Tileset Loading
+    - Multiple Maps and Transform Maps
  
  Fixes:
     - Mouse flipping should not be using Units (exclusively, mostly Amps) and should be applied to x and y
@@ -46,7 +50,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     public let features: SummerFeatures
     private let view: SummerView
     
-    private let device: MTLDevice!
+    internal let device: MTLDevice!
     private let commandQueue: MTLCommandQueue!
     
     internal let objectBuffer: MTLBuffer!
@@ -67,6 +71,9 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     public var globalDraw: SummerDraw!
     public var globalTransform: SummerTransform!
     internal let objectDraws = LinkedList<SummerDraw>()
+    
+    private let mapPipelineState: MTLRenderPipelineState
+    internal weak var currentMap: SummerMap?
     
     private var isAborting = false
     public func abort() {
@@ -112,6 +119,14 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         dequeueModifies()
         if let commandBuffer = commandQueue.makeCommandBuffer() {
             if let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: view.currentRenderPassDescriptor!) {
+                if let map = currentMap {
+                    renderEncoder.setRenderPipelineState(mapPipelineState)
+                    renderEncoder.setFragmentSamplerState(samplerState, index: 0)
+
+                    map.setResources(renderEncoder)
+                    map.addDraws(renderEncoder)
+                }
+                
                 renderEncoder.setRenderPipelineState(pipelineState)
                 renderEncoder.setVertexBuffer(objectBuffer, offset: 0, index: 0)
                 renderEncoder.setVertexBuffer(transformBuffer, offset: 0, index: 1)
@@ -120,8 +135,10 @@ public class SummerEngine : NSObject, MTKViewDelegate {
                 renderEncoder.setFragmentSamplerState(samplerState, index: 0)
                 globalDraw.addDraws(encoder: renderEncoder)
                 for draw in objectDraws { draw.addDraws(encoder: renderEncoder) }
+                
                 renderEncoder.endEncoding()
             }
+            
             commandBuffer.present(view.currentDrawable!)
             commandBuffer.commit()
         }
@@ -174,7 +191,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
                                                 keepObjects: [SummerObject],
                                                 keepTextures: [SummerTexture] = [],
                                                 keepDraws: [SummerDraw] = [],
-                                                keepTransforms: [SummerTransform] = []) -> SummerProgram{
+                                                keepTransforms: [SummerTransform] = []) -> SummerProgram {
         freeAllocations()
         
         for texture in keepTextures { texture.allocate() }
@@ -206,8 +223,8 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         return keyStates[Int(key)]
     }
     
-    public func isKeyPressed(key: UInt16) -> Bool {
-        return getKeyState(key: key) == .pressed
+    public func isKeyPressed(key: SummerKey) -> Bool {
+        return getKeyState(key: key.rawValue) == .pressed
     }
     
     internal func keyChanged(key: UInt16, characters: String?, state: SummerInputState) {
@@ -250,7 +267,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     }
     
     public func makeTexture(fromFile file: String,
-                            _ location: SummerTexture.SummerFileLocation = .inFolder) -> SummerTexture? {
+                            _ location: SummerFileLocation = .inFolder) -> SummerTexture? {
         return SummerTexture(self, fromFile: file, location)
     }
     
@@ -264,6 +281,42 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     
     public func makeDraw() -> SummerDraw { return SummerDraw(self) }
     public func makeTransform() -> SummerTransform { return SummerTransform(self) }
+    
+    public func makeTileset(tileWidth: Int, tileHeight: Int, data: [[UInt8]]) -> SummerTileset {
+        return SummerTileset(self, tileWidth: tileWidth, tileHeight: tileHeight, data: data)
+    }
+    
+    public func makeTileset(tileWidth: Int, tileHeight: Int, data: [[Float]]) -> SummerTileset {
+        return SummerTileset(self, tileWidth: tileWidth, tileHeight: tileHeight, data: data)
+    }
+    
+    public func makeTileset(fromFiles files: [String], _ location: SummerFileLocation) -> SummerTileset? {
+        return SummerTileset(self, fromFiles: files, location)
+    }
+    
+    public func makeMap(width: Int, height: Int,
+                        data: [UInt32],
+                        tileset: SummerTileset,
+                        unitX: Float, unitY: Float,
+                        mapType: SummerMapType = .staticMap) -> SummerMap {
+        return SummerMap(self,
+                         width: width, height: height,
+                         data: data,
+                         tileset: tileset,
+                         unitX: unitX, unitY: unitY,
+                         mapType: mapType)
+    }
+    
+    public func makeMap(width: Int, height: Int,
+                        data: [UInt32],
+                        tileset: SummerTileset,
+                        mapType: SummerMapType = .staticMap) -> SummerMap {
+        return SummerMap(self,
+                         width: width, height: height,
+                         data: data,
+                         tileset: tileset,
+                         mapType: mapType)
+    }
     
     public init(_ nProgram: SummerProgram,
                 view nView: SummerView,
@@ -283,11 +336,19 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         if commandQueue == nil { throw SummerError.cannotCreateQueue }
         
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
+        let mapPipelineDescriptor = MTLRenderPipelineDescriptor()
         if let library = device.makeDefaultLibrary() {
-            pipelineDescriptor.vertexFunction = library.makeFunction(name: "vertexShader")!
-            pipelineDescriptor.fragmentFunction = library.makeFunction(name: "textureShader")!
+            let vertexShader = library.makeFunction(name: "vertexShader")
+            let mapVertexShader = library.makeFunction(name: "mapVertexShader")
+            let textureShader = library.makeFunction(name: "textureShader")
+            
+            pipelineDescriptor.vertexFunction = vertexShader
+            pipelineDescriptor.fragmentFunction = textureShader
+            mapPipelineDescriptor.vertexFunction = mapVertexShader
+            mapPipelineDescriptor.fragmentFunction = textureShader
         } else { throw SummerError.noDefaultLibrary }
         pipelineDescriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat
+        mapPipelineDescriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat
         if features.transparency {
             pipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
             pipelineDescriptor.colorAttachments[0].rgbBlendOperation = .add
@@ -306,8 +367,11 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         vertexDescriptor.attributes[1].bufferIndex = 0
         vertexDescriptor.layouts[0].stride = MemoryLayout<Float>.size * 4
         pipelineDescriptor.vertexDescriptor = vertexDescriptor
+        
         do { pipelineState = try device.makeRenderPipelineState(descriptor: pipelineDescriptor) }
         catch { throw SummerError.cannotCreatePipelineState }
+        do { mapPipelineState = try device.makeRenderPipelineState(descriptor: mapPipelineDescriptor) }
+        catch { throw SummerError.cannotCreateMapPipelineState }
         
         let samplerDescriptor = MTLSamplerDescriptor()
         samplerDescriptor.minFilter = .nearest
@@ -343,7 +407,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         
         super.init()
         
-        globalDraw = SummerDraw(nil)
+        globalDraw = SummerDraw(nil, isGlobal: true)
         globalTransform = SummerTransform(self, isGlobal: true)
         
         if !view.setEngine(engine: self) { throw SummerError.viewInUse }

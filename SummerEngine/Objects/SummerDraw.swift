@@ -195,9 +195,9 @@ public class SummerDraw {
         if findLoc != -1 { parent!.objectDraws.remove(at: findLoc) }
     }
     
-    internal init(_ parent: SummerEngine?) {
+    internal init(_ parent: SummerEngine?, isGlobal: Bool = false) {
         self.parent = parent
-        self.isGlobal = parent == nil
+        self.isGlobal = isGlobal
         
         parent?.objectDraws.append(self)
     }

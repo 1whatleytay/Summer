@@ -26,10 +26,13 @@ public struct SummerSettings {
     public var deleteTexturesOnDealloc = false
     public var deleteTransformsOnDealloc = false
     
+    public var autoMakeTransformWithObject = false
+    public var autoMakeDrawWithObject = false
+    
     public var mergeDrawRanges = true
     public var conserveModifyMemory = false
     
-    public var defaultTextureLocation = SummerTexture.SummerFileLocation.inBundle
+    public var defaultTextureLocation = SummerFileLocation.inBundle
     
     public var debugPrintAllocationMessages = false
     

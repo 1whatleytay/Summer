@@ -72,13 +72,13 @@ public class SummerTransform {
         if transformId == -1 { return }
         
         let start = transformId * SummerTransform.size
-        let end = transformId * SummerTransform.size + SummerTransform.size
+        let end = start + SummerTransform.size
         
         parent.transformBuffer.contents()
             .advanced(by: start)
             .copyMemory(from: data.data(), byteCount: SummerTransform.size)
         
-        if parent.features.staticTransform { parent.transformBuffer.didModifyRange(start..<end) }
+        parent.transformBuffer.didModifyRange(start..<end)
     }
     
     public func commit() {
@@ -90,13 +90,13 @@ public class SummerTransform {
     
     public func pivot(objectId: Int) {
         let start = objectId * SummerTransform.pivotSize
-        let end = objectId * SummerTransform.pivotSize + SummerTransform.pivotSize
+        let end = start + SummerTransform.pivotSize
         
         parent.pivotBuffer.contents()
             .advanced(by: start)
             .copyMemory(from: [transformId], byteCount: SummerTransform.pivotSize)
         
-        if parent.features.staticPivot { parent.pivotBuffer.didModifyRange(start..<end) }
+        parent.pivotBuffer.didModifyRange(start..<end)
     }
     
     public func change(matrix: simd_float2x2) {

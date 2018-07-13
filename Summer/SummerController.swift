@@ -24,7 +24,7 @@ class SummerController: NSViewController {
         features.staticTransform = true
         
         do {
-            engine = try SummerEngine(SummerGame(), view: summerView, features: features)
+            engine = try SummerEngine(SummerMapTest(), view: summerView, features: features)
         } catch let e {
             switch e {
             case SummerError.cannotCreateDevice: print("Cannot create device!")

@@ -21,13 +21,12 @@ class SummerGame: SummerProgram {
         
         engine.settings.name = "Summer"
         engine.settings.verticalAmp = -1
-        engine.settings.debugPrintAllocationMessages = true
         
         colorRed = engine.makeTexture(fromFile: "fourty.png")
         colorBlue = engine.makeColor(red: 0, green: 0, blue: 1, alpha: 1)
         colorGreen = engine.makeColor(red: 0, green: 1, blue: 0, alpha: 1)
         
-        red = engine.makeObject(x: 50, y: 50, width: 500, height: 500, texture: colorRed).withTransform()
+        red = engine.makeObject(x: 50, y: 50, width: 500, height: 500, texture: colorRed)
         blue = engine.makeObject(x: 150, y: 150, width: 300, height: 300, texture: colorBlue)
         green = engine.makeObject(x: 250, y: 250, width: 100, height: 100, texture: colorGreen)
         
@@ -36,10 +35,10 @@ class SummerGame: SummerProgram {
     }
     
     func update() {
-        if engine.isKeyPressed(key: 13) { blue.y -= 2 }
-        if engine.isKeyPressed(key: 0) { blue.x -= 2 }
-        if engine.isKeyPressed(key: 1) { blue.y += 2 }
-        if engine.isKeyPressed(key: 2) { blue.x += 2 }
+        if engine.isKeyPressed(key: .vkW) { blue.y -= 2 }
+        if engine.isKeyPressed(key: .vkA) { blue.x -= 2 }
+        if engine.isKeyPressed(key: .vkS) { blue.y += 2 }
+        if engine.isKeyPressed(key: .vkD) { blue.x += 2 }
         blue.save()
         
         red.transform.rotate(degree: 1)
@@ -64,6 +63,7 @@ class SummerGame: SummerProgram {
             break
         }
     }
+    
     func mouse(button: SummerMouseButton, x: Double, y: Double, state: SummerInputState) { }
 }
 

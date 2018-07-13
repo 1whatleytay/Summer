@@ -61,9 +61,14 @@ public class SummerObject {
     public func save() {
         if objectId == -1 { return }
         
+        let start = objectId * SummerObject.size
+        let end = start + SummerObject.size
+        
         parent.objectBuffer.contents()
-            .advanced(by: objectId * SummerObject.size)
+            .advanced(by: start)
             .copyMemory(from: objectData(), byteCount: SummerObject.size)
+        
+        parent.objectBuffer.didModifyRange(start ..< end)
     }
     
     public func commit() {
@@ -200,7 +205,7 @@ public class SummerObject {
                             texture: SummerTexture) {
         self.init(parent,
                   draw: draw,
-                  transform: parent.globalTransform,
+                  transform: parent.settings.autoMakeTransformWithObject ? parent.makeTransform() : parent.globalTransform,
                   x: x, y: y,
                   width: width, height: height,
                   texture: texture)
@@ -212,7 +217,7 @@ public class SummerObject {
                             width: Float, height: Float,
                             texture: SummerTexture) {
         self.init(parent,
-                  draw: parent.globalDraw,
+                  draw: parent.settings.autoMakeDrawWithObject ? parent.makeDraw() : parent.globalDraw,
                   transform: transform,
                   x: x, y: y,
                   width: width, height: height,
@@ -224,8 +229,8 @@ public class SummerObject {
                             width: Float, height: Float,
                             texture: SummerTexture) {
         self.init(parent,
-                  draw: parent.globalDraw,
-                  transform: parent.globalTransform,
+                  draw: parent.settings.autoMakeDrawWithObject ? parent.makeDraw() : parent.globalDraw,
+                  transform: parent.settings.autoMakeTransformWithObject ? parent.makeTransform() : parent.globalTransform,
                   x: x, y: y,
                   width: width, height: height,
                   texture: texture)

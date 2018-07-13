@@ -16,6 +16,35 @@ public class SummerTexture {
     
     public func getSize() -> (width: Int, height: Int) { return (width: width, height: height) }
     
+    public static func getTextureData(fromFile file: String, _ location: SummerFileLocation) ->
+        (width: Int, height: Int, data: [Float])? {
+            var imageData: [Float]
+            var width = 0, height = 0
+            
+            if let image = location == .inFolder ? NSImage(contentsOfFile: file) : NSImage(named: file) {
+                width = Int(image.size.width)
+                height = Int(image.size.height)
+                
+                imageData = [Float](repeating: 0, count: width * height * 4)
+                
+                guard let bitmap = NSBitmapImageRep(data: image.tiffRepresentation!)
+                    else { return nil }
+                
+                for x in 0 ..< width {
+                    for y in 0 ..< height {
+                        let color = bitmap.colorAt(x: x, y: y)!
+                        
+                        imageData[(x + y * width) * 4] = Float(color.redComponent)
+                        imageData[(x + y * width) * 4 + 1] = Float(color.greenComponent)
+                        imageData[(x + y * width) * 4 + 2] = Float(color.blueComponent)
+                        imageData[(x + y * width) * 4 + 3] = Float(color.alphaComponent)
+                    }
+                }
+            } else { return nil }
+            
+            return (width: width, height: height, data: imageData)
+    }
+    
     internal static func allocate(_ parent: SummerEngine, width: Int, height: Int) -> (x: Int, y: Int) {
         var found = false
         var findX = -1, findY = -1
@@ -113,43 +142,11 @@ public class SummerTexture {
         self.init(parent, width: width, height: height, data: subData)
     }
     
-    public enum SummerFileLocation {
-        case inFolder
-        case inBundle
-    }
-    
     public convenience init?(_ parent: SummerEngine, fromFile file: String, _ location: SummerFileLocation = .inFolder) {
-        var imageData: [Float]
-        var width = 0, height = 0
+        guard let texData = SummerTexture.getTextureData(fromFile: file, location)
+            else { return nil }
         
-        if let image = location == .inFolder ? NSImage(contentsOfFile: file) : NSImage(named: file) {
-            width = Int(image.size.width)
-            height = Int(image.size.height)
-            
-            imageData = [Float](repeating: 0, count: width * height * 4)
-            
-            guard let bitmap = NSBitmapImageRep(data: image.tiffRepresentation!)
-                else {
-                    parent.program.message(message: .couldNotFindTexture)
-                    return nil
-                }
-            
-            for x in 0 ..< width {
-                for y in 0 ..< height {
-                    let color = bitmap.colorAt(x: x, y: y)!
-                    
-                    imageData[(x + y * width) * 4] = Float(color.redComponent)
-                    imageData[(x + y * width) * 4 + 1] = Float(color.greenComponent)
-                    imageData[(x + y * width) * 4 + 2] = Float(color.blueComponent)
-                    imageData[(x + y * width) * 4 + 3] = Float(color.alphaComponent)
-                }
-            }
-        } else {
-            parent.program.message(message: .couldNotFindTexture)
-            return nil
-        }
-        
-        self.init(parent, width: width, height: height, data: imageData)
+        self.init(parent, width: texData.width, height: texData.height, data: texData.data)
     }
     
     public convenience init?(_ parent: SummerEngine, fromFile file: String) {

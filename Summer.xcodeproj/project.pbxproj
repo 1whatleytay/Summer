@@ -20,8 +20,12 @@
 		B80C2E3120F5991E007E8647 /* SummerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = B80C2E3020F5991E007E8647 /* SummerInput.swift */; };
 		B826A0B520F2F5CE00ABED4A /* SummerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D25B0520E52D1F005EFF90 /* SummerError.swift */; };
 		B845A89520E09F6C000904D3 /* SummerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B845A89420E09F6C000904D3 /* SummerView.swift */; };
+		B84DEE7620F7E3AD00D397A8 /* SummerMapTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84DEE7520F7E3AD00D397A8 /* SummerMapTest.swift */; };
 		B8B02E1320F1481000951616 /* SummerTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B02E1220F1481000951616 /* SummerTransform.swift */; };
 		B8C57E5C20F6C6DC007F06DC /* SummerShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = B8098F3120E28045008A180B /* SummerShaders.metal */; };
+		B8C57E5E20F6E876007F06DC /* SummerTileset.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C57E5D20F6E876007F06DC /* SummerTileset.swift */; };
+		B8C57E6020F70364007F06DC /* SummerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C57E5F20F70364007F06DC /* SummerData.swift */; };
+		B8C57E6220F79162007F06DC /* SummerMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C57E6120F79162007F06DC /* SummerMap.swift */; };
 		B8D25B0820E52DAF005EFF90 /* SummerMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D25B0720E52DAF005EFF90 /* SummerMessage.swift */; };
 		B8D9588720F5133600ED5BE7 /* SummerFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D9588620F5133600ED5BE7 /* SummerFeatures.swift */; };
 		B8E9C50020E01CC900BA74A9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E9C4FF20E01CC900BA74A9 /* AppDelegate.swift */; };
@@ -69,8 +73,12 @@
 		B8098F3A20E2805A008A180B /* SummerSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SummerSettings.swift; sourceTree = "<group>"; };
 		B80C2E3020F5991E007E8647 /* SummerInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerInput.swift; sourceTree = "<group>"; };
 		B845A89420E09F6C000904D3 /* SummerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerView.swift; sourceTree = "<group>"; };
+		B84DEE7520F7E3AD00D397A8 /* SummerMapTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerMapTest.swift; sourceTree = "<group>"; };
 		B8B02DFA20F0FD6600951616 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		B8B02E1220F1481000951616 /* SummerTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerTransform.swift; sourceTree = "<group>"; };
+		B8C57E5D20F6E876007F06DC /* SummerTileset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerTileset.swift; sourceTree = "<group>"; };
+		B8C57E5F20F70364007F06DC /* SummerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerData.swift; sourceTree = "<group>"; };
+		B8C57E6120F79162007F06DC /* SummerMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerMap.swift; sourceTree = "<group>"; };
 		B8D25B0520E52D1F005EFF90 /* SummerError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerError.swift; sourceTree = "<group>"; };
 		B8D25B0720E52DAF005EFF90 /* SummerMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerMessage.swift; sourceTree = "<group>"; };
 		B8D9588620F5133600ED5BE7 /* SummerFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerFeatures.swift; sourceTree = "<group>"; };
@@ -128,6 +136,8 @@
 				B8098F3920E2805A008A180B /* SummerTexture.swift */,
 				B8B02E1220F1481000951616 /* SummerTransform.swift */,
 				B80559DB20EAD39E00F7B749 /* SummerDraw.swift */,
+				B8C57E5D20F6E876007F06DC /* SummerTileset.swift */,
+				B8C57E6120F79162007F06DC /* SummerMap.swift */,
 			);
 			path = Objects;
 			sourceTree = "<group>";
@@ -138,6 +148,7 @@
 				B8D25B0720E52DAF005EFF90 /* SummerMessage.swift */,
 				B8D25B0520E52D1F005EFF90 /* SummerError.swift */,
 				B80C2E3020F5991E007E8647 /* SummerInput.swift */,
+				B8C57E5F20F70364007F06DC /* SummerData.swift */,
 			);
 			path = Enums;
 			sourceTree = "<group>";
@@ -184,6 +195,7 @@
 			children = (
 				B80559D420EA68DC00F7B749 /* Resources */,
 				B8098F3020E28045008A180B /* SummerGame.swift */,
+				B84DEE7520F7E3AD00D397A8 /* SummerMapTest.swift */,
 				B8098F3220E28045008A180B /* SummerController.swift */,
 				B8098F3120E28045008A180B /* SummerShaders.metal */,
 				B8E9C4FF20E01CC900BA74A9 /* AppDelegate.swift */,
@@ -340,6 +352,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B84DEE7620F7E3AD00D397A8 /* SummerMapTest.swift in Sources */,
 				B8098F3320E28045008A180B /* SummerGame.swift in Sources */,
 				B8098F3520E28045008A180B /* SummerController.swift in Sources */,
 				B8E9C50020E01CC900BA74A9 /* AppDelegate.swift in Sources */,
@@ -352,6 +365,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B80559DA20EA94B700F7B749 /* LinkedList.swift in Sources */,
+				B8C57E6220F79162007F06DC /* SummerMap.swift in Sources */,
 				B80C2E3120F5991E007E8647 /* SummerInput.swift in Sources */,
 				B8098F3E20E2805A008A180B /* SummerTexture.swift in Sources */,
 				B8098F3C20E2805A008A180B /* SummerEngine.swift in Sources */,
@@ -360,8 +374,10 @@
 				B826A0B520F2F5CE00ABED4A /* SummerError.swift in Sources */,
 				B80559DC20EAD39E00F7B749 /* SummerDraw.swift in Sources */,
 				B8D9588720F5133600ED5BE7 /* SummerFeatures.swift in Sources */,
+				B8C57E6020F70364007F06DC /* SummerData.swift in Sources */,
 				B8B02E1320F1481000951616 /* SummerTransform.swift in Sources */,
 				B8098F3B20E2805A008A180B /* SummerObject.swift in Sources */,
+				B8C57E5E20F6E876007F06DC /* SummerTileset.swift in Sources */,
 				B8098F3F20E2805A008A180B /* SummerSettings.swift in Sources */,
 				B8098F3D20E2805A008A180B /* SummerProgram.swift in Sources */,
 			);

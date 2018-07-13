@@ -13,6 +13,7 @@ public enum SummerError: Error {
     case cannotCreateQueue
     case noDefaultLibrary
     case cannotCreatePipelineState
+    case cannotCreateMapPipelineState
     case cannotCreateObjectBuffer
     case cannotCreateTransformBuffer
     case cannotCreatePivotBuffer
