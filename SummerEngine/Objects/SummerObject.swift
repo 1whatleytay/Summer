@@ -20,6 +20,8 @@ public class SummerObject {
     public var x, y, width, height: Float
     public var texture: SummerTexture
     
+    public private(set) var isVisible: Bool
+    
     public private(set) var draw: SummerDraw
     public private(set) var transform: SummerTransform
     
@@ -118,7 +120,7 @@ public class SummerObject {
     }
     
     public func withTransform() -> SummerObject {
-        return withTransform(transform: SummerTransform(parent))
+        return withTransform(transform: parent.makeTransform())
     }
     
     public func texture(_ texture: SummerTexture)  {
@@ -144,6 +146,37 @@ public class SummerObject {
         commit()
     }
     
+    public func hide() {
+        if isVisible {
+            draw.removeIndex(index: objectId)
+            isVisible = false
+        }
+    }
+    
+    public func show() {
+        if !isVisible {
+            draw.addIndex(index: objectId)
+            isVisible = true
+        }
+    }
+    
+    public func setVisible(value: Bool) {
+        if value { show() }
+        else { hide() }
+    }
+    
+    public func toggleVisible() { setVisible(value: !isVisible) }
+    
+    public func duplicate() -> SummerObject {
+        return SummerObject(parent,
+                            draw: draw,
+                            transform: transform,
+                            x: x, y: y,
+                            width: width, height: height,
+                            texture: texture,
+                            isVisible: isVisible)
+    }
+    
     public func delete() {
         if objectId == -1 { return }
         
@@ -158,7 +191,8 @@ public class SummerObject {
                  transform: SummerTransform,
                  x: Float, y: Float,
                  width: Float, height: Float,
-                 texture: SummerTexture) {
+                 texture: SummerTexture,
+                 isVisible: Bool = true) {
         self.parent = parent
         self.objectId = objectId
         
@@ -170,7 +204,8 @@ public class SummerObject {
         self.texture = texture
         
         self.draw = draw
-        draw.addIndex(index: objectId)
+        self.isVisible = isVisible
+        if isVisible { draw.addIndex(index: objectId) }
         
         self.transform = parent.globalTransform
         transform.pivot(objectId: objectId)
@@ -183,7 +218,8 @@ public class SummerObject {
                             transform: SummerTransform,
                             x: Float, y: Float,
                             width: Float, height: Float,
-                            texture: SummerTexture) {
+                            texture: SummerTexture,
+                            isVisible: Bool = true) {
         let objectId = SummerObject.allocate(parent)
         
         if objectId == -1 { parent.program.message(message: .outOfObjectMemory) }
@@ -193,7 +229,8 @@ public class SummerObject {
                   transform: transform,
                   x: x, y: y,
                   width: width, height: height,
-                  texture: texture)
+                  texture: texture,
+                  isVisible: isVisible)
         
         allocate()
     }
@@ -202,37 +239,43 @@ public class SummerObject {
                             draw: SummerDraw,
                             x: Float, y: Float,
                             width: Float, height: Float,
-                            texture: SummerTexture) {
+                            texture: SummerTexture,
+                            isVisible: Bool = true) {
         self.init(parent,
                   draw: draw,
                   transform: parent.settings.autoMakeTransformWithObject ? parent.makeTransform() : parent.globalTransform,
                   x: x, y: y,
                   width: width, height: height,
-                  texture: texture)
+                  texture: texture,
+                  isVisible: isVisible)
     }
     
     public convenience init(_ parent: SummerEngine,
                             transform: SummerTransform,
                             x: Float, y: Float,
                             width: Float, height: Float,
-                            texture: SummerTexture) {
+                            texture: SummerTexture,
+                            isVisible: Bool = true) {
         self.init(parent,
                   draw: parent.settings.autoMakeDrawWithObject ? parent.makeDraw() : parent.globalDraw,
                   transform: transform,
                   x: x, y: y,
                   width: width, height: height,
-                  texture: texture)
+                  texture: texture,
+                  isVisible: isVisible)
     }
     
     public convenience init(_ parent: SummerEngine,
                             x: Float, y: Float,
                             width: Float, height: Float,
-                            texture: SummerTexture) {
+                            texture: SummerTexture,
+                            isVisible: Bool = true) {
         self.init(parent,
                   draw: parent.settings.autoMakeDrawWithObject ? parent.makeDraw() : parent.globalDraw,
                   transform: parent.settings.autoMakeTransformWithObject ? parent.makeTransform() : parent.globalTransform,
                   x: x, y: y,
                   width: width, height: height,
-                  texture: texture)
+                  texture: texture,
+                  isVisible: isVisible)
     }
 }

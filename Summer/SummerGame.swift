@@ -26,12 +26,9 @@ class SummerGame: SummerProgram {
         colorBlue = engine.makeColor(red: 0, green: 0, blue: 1, alpha: 1)
         colorGreen = engine.makeColor(red: 0, green: 1, blue: 0, alpha: 1)
         
-        red = engine.makeObject(x: 50, y: 50, width: 500, height: 500, texture: colorRed)
+        red = engine.makeObject(x: 50, y: 50, width: 500, height: 500, texture: colorRed).withTransform()
         blue = engine.makeObject(x: 150, y: 150, width: 300, height: 300, texture: colorBlue)
-        green = engine.makeObject(x: 250, y: 250, width: 100, height: 100, texture: colorGreen)
-        
-        red.transform.moveOffset(x: 100, y: 0)
-        red.transform.setOrigin(x: 100, y: 100)
+        green = engine.makeObject(x: 250, y: 250, width: 100, height: 100, texture: colorGreen, isVisible: false)
     }
     
     func update() {
@@ -56,11 +53,15 @@ class SummerGame: SummerProgram {
     }
     
     func key(key: SummerKey, characters: String?, state: SummerInputState) {
-        switch key {
-        case .vkReturn:
-            engine.swapPrograms(SummerMenu(red), keepObjects: [red])
-        default:
-            break
+        if state == .pressed {
+            switch key {
+            case .vkReturn:
+                engine.swapPrograms(SummerMenu(red), keepObjects: [red])
+            case .vkL:
+                green.toggleVisible()
+            default:
+                break
+            }
         }
     }
     

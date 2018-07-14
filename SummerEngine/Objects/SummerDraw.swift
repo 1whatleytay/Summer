@@ -31,7 +31,7 @@ public class SummerDraw {
         if parent == nil { return -1 }
         
         var findLoc = -1
-        for (i, elm) in parent!.objectDraws.enumerated() { if elm === self { findLoc = i } }
+        for (i, draw) in parent!.objectDraws.enumerated() { if draw === self { findLoc = i } }
         
         return findLoc
     }

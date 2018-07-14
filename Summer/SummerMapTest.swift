@@ -39,9 +39,12 @@ class SummerMapTest: SummerProgram {
                              data: mapData,
                              tileset: tileset,
                              unitX: 200, unitY: 200,
-                             mapType: .dynamicMap)
+                             mapType: .dynamicMap).withTransform()
         
-        map.setCurrent()
+        map.transform.moveOffset(x: 100, y: 100)
+        map.transform.setOrigin(x: 150, y: 150)
+        
+        map.setActive()
         
         myObject = engine.makeObject(x: 0, y: 0, width: 50, height: 50, texture: engine.makeTexture(fromFile: "fourty.png", .inBundle)!)
     }
@@ -64,6 +67,8 @@ class SummerMapTest: SummerProgram {
     func mouse(button: SummerMouseButton, x: Double, y: Double, state: SummerInputState) {
         if state == .movement {
             myObject.put(x: Float(x), y: Float(y))
+            map.transform.setIdentity()
+            map.transform.rotate(degree: Float(x / 2))
         }
     }
     

@@ -105,7 +105,7 @@ public class SummerTexture {
     
     deinit { if parent.settings.deleteTexturesOnDealloc { delete() } }
     
-    internal init(_ parent: SummerEngine, x: Int, y: Int, width: Int, height: Int) {
+    private init(_ parent: SummerEngine, x: Int, y: Int, width: Int, height: Int) {
         self.parent = parent
         
         self.x = x
@@ -119,7 +119,7 @@ public class SummerTexture {
         self.vertY2 = Float(y + height) / Float(parent.features.textureAllocHeight)
     }
     
-    public convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [UInt8]) {
+    internal convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [UInt8]) {
         let pos = SummerTexture.allocate(parent, width: width, height: height)
         
         if pos.x == -1 {
@@ -133,7 +133,7 @@ public class SummerTexture {
         allocate()
     }
     
-    public convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [Float]) {
+    internal convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [Float]) {
         var subData = [UInt8](repeating: 0, count: data.count)
         for (index, element) in data.enumerated() {
             subData[index] = UInt8(element * 255)
@@ -142,14 +142,14 @@ public class SummerTexture {
         self.init(parent, width: width, height: height, data: subData)
     }
     
-    public convenience init?(_ parent: SummerEngine, fromFile file: String, _ location: SummerFileLocation = .inFolder) {
+    internal convenience init?(_ parent: SummerEngine, fromFile file: String, _ location: SummerFileLocation = .inFolder) {
         guard let texData = SummerTexture.getTextureData(fromFile: file, location)
             else { return nil }
         
         self.init(parent, width: texData.width, height: texData.height, data: texData.data)
     }
     
-    public convenience init?(_ parent: SummerEngine, fromFile file: String) {
+    internal convenience init?(_ parent: SummerEngine, fromFile file: String) {
         self.init(parent, fromFile: file, parent.settings.defaultTextureLocation)
     }
 }

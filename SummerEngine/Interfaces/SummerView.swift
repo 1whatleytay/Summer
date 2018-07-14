@@ -98,6 +98,10 @@ public class SummerView: MTKView {
         NSEvent.addLocalMonitorForEvents(matching: .otherMouseUp) { self.otherMouseUp(with: $0); return $0 }
         NSEvent.addLocalMonitorForEvents(matching: .otherMouseDown) { self.otherMouseDown(with: $0); return $0 }
         NSEvent.addLocalMonitorForEvents(matching: .mouseMoved) { self.mouseMoved(with: $0); return $0 }
+        
+        // Dragged event?
+        NSEvent.addLocalMonitorForEvents(matching: .leftMouseDragged) { self.mouseMoved(with: $0); return $0 }
+        NSEvent.addLocalMonitorForEvents(matching: .rightMouseDragged) { self.mouseMoved(with: $0); return $0 }
     }
     
     internal func setEngine(engine: SummerEngine) -> Bool {

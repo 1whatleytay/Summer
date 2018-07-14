@@ -26,6 +26,9 @@ import MetalKit
     - Swap Programs
     - Tilesets (Seperate texture)
     - Maps (Tiled maps w/ tileset)
+    - Default Settings by Controller
+    - Visibility
+    - Multiple Maps and Transform Maps
  
  Things I gave up on:
     - Mouse Capture
@@ -35,13 +38,11 @@ import MetalKit
     - Animation Groups (Part of the main texture)
     - Documentation
     - Modify Textures
-    - Default Settings by Controller
     - Single File Tileset Loading
-    - Multiple Maps and Transform Maps
+    - Combined Transforms
  
  Fixes:
     - Mouse flipping should not be using Units (exclusively, mostly Amps) and should be applied to x and y
-    - Screen size parameter to program info should be added (setScreensize() for units too?)
  */
 
 public class SummerEngine : NSObject, MTKViewDelegate {
@@ -68,12 +69,12 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     private var objectModifyQueue = [SummerObject]()
     private var transformModifyQueue = [SummerTransform]()
     
-    public var globalDraw: SummerDraw!
-    public var globalTransform: SummerTransform!
+    public private(set) var globalDraw: SummerDraw!
+    public private(set) var globalTransform: SummerTransform!
     internal let objectDraws = LinkedList<SummerDraw>()
     
     private let mapPipelineState: MTLRenderPipelineState
-    internal weak var currentMap: SummerMap?
+    internal var maps = [SummerMap]()
     
     private var isAborting = false
     public func abort() {
@@ -119,12 +120,13 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         dequeueModifies()
         if let commandBuffer = commandQueue.makeCommandBuffer() {
             if let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: view.currentRenderPassDescriptor!) {
-                if let map = currentMap {
+                renderEncoder.setFragmentSamplerState(samplerState, index: 0)
+                if maps.count > 0 {
                     renderEncoder.setRenderPipelineState(mapPipelineState)
-                    renderEncoder.setFragmentSamplerState(samplerState, index: 0)
-
-                    map.setResources(renderEncoder)
-                    map.addDraws(renderEncoder)
+                    for map in maps {
+                        map.setResources(renderEncoder)
+                        map.addDraws(renderEncoder)
+                    }
                 }
                 
                 renderEncoder.setRenderPipelineState(pipelineState)
@@ -132,7 +134,6 @@ public class SummerEngine : NSObject, MTKViewDelegate {
                 renderEncoder.setVertexBuffer(transformBuffer, offset: 0, index: 1)
                 renderEncoder.setVertexBuffer(pivotBuffer, offset: 0, index: 2)
                 renderEncoder.setFragmentTexture(texture, index: 0)
-                renderEncoder.setFragmentSamplerState(samplerState, index: 0)
                 globalDraw.addDraws(encoder: renderEncoder)
                 for draw in objectDraws { draw.addDraws(encoder: renderEncoder) }
                 
@@ -251,11 +252,13 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     public func makeObject(
         x: Float, y: Float,
         width: Float, height: Float,
-        texture: SummerTexture) -> SummerObject {
+        texture: SummerTexture,
+        isVisible: Bool = true) -> SummerObject {
         return SummerObject(self,
                             x: x, y: y,
                             width: width, height: height,
-                            texture: texture)
+                            texture: texture,
+                            isVisible: isVisible)
     }
     
     public func makeTexture(width: Int, height: Int, data: [UInt8]) -> SummerTexture {
@@ -318,12 +321,13 @@ public class SummerEngine : NSObject, MTKViewDelegate {
                          mapType: mapType)
     }
     
-    public init(_ nProgram: SummerProgram,
+    public init(_ program: SummerProgram,
                 view nView: SummerView,
-                features nFeatures: SummerFeatures = SummerFeatures()) throws {
-        program = nProgram
-        features = nFeatures
-        settings = SummerSettings()
+                features: SummerFeatures = SummerFeatures(),
+                settings: SummerSettings = SummerSettings()) throws {
+        self.program = program
+        self.features = features
+        self.settings = settings
         view = nView
         
         program.message(message: .starting)

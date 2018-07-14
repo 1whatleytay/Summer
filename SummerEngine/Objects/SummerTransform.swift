@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Metal
 import simd
 
 public class SummerTransform {
@@ -88,7 +89,7 @@ public class SummerTransform {
         }
     }
     
-    public func pivot(objectId: Int) {
+    internal func pivot(objectId: Int) {
         let start = objectId * SummerTransform.pivotSize
         let end = start + SummerTransform.pivotSize
         
@@ -97,6 +98,10 @@ public class SummerTransform {
             .copyMemory(from: [transformId], byteCount: SummerTransform.pivotSize)
         
         parent.pivotBuffer.didModifyRange(start..<end)
+    }
+    
+    internal func setMapTransform(_ renderEncoder: MTLRenderCommandEncoder) {
+        renderEncoder.setVertexBuffer(parent.transformBuffer, offset: SummerTransform.size * transformId, index: 2)
     }
     
     public func change(matrix: simd_float2x2) {
@@ -184,5 +189,7 @@ public class SummerTransform {
         if transformId == -1 { parent.program.message(message: .outOfTransformMemory) }
         
         self.init(parent, transformId: transformId, isGlobal: isGlobal)
+        
+        allocate()
     }
 }
