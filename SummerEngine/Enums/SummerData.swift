@@ -6,15 +6,9 @@
 //  Copyright © 2018 Taylor Whatley. All rights reserved.
 //
 
-import GLKit
+import Metal
 
 public enum SummerFileLocation {
     case inFolder
     case inBundle
-}
-
-public enum SummerMapType {
-    case readonlyMap
-    case staticMap
-    case dynamicMap
 }

@@ -52,9 +52,9 @@ public class SummerTransform {
     
     public static func allocate(_ parent: SummerEngine) -> Int {
         var indexFind = -1
-        for (index, alloc) in parent.transformAllocationData.enumerated() {
-            if !alloc {
-                indexFind = index
+        for i in 0 ..< parent.transformAllocationData.count {
+            if !parent.transformAllocationData[i] {
+                indexFind = i
                 break
             }
         }

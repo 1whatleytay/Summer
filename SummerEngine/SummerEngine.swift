@@ -29,17 +29,16 @@ import MetalKit
     - Default Settings by Controller
     - Visibility
     - Multiple Maps and Transform Maps
- 
- Things I gave up on:
-    - Mouse Capture
+    - Animation Groups (Part of the main texture)
  
  Cool Features:
     - Buttons
-    - Animation Groups (Part of the main texture)
     - Documentation
     - Modify Textures
-    - Single File Tileset Loading
+    - Single File Tileset Loading (GIF and Tileset Image)
     - Combined Transforms
+    - Events
+    - Batch Tileset/Animation loading
  
  Fixes:
     - Mouse flipping should not be using Units (exclusively, mostly Amps) and should be applied to x and y
@@ -52,7 +51,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     private let view: SummerView
     
     internal let device: MTLDevice!
-    private let commandQueue: MTLCommandQueue!
+    internal let commandQueue: MTLCommandQueue!
     
     internal let objectBuffer: MTLBuffer!
     internal let transformBuffer: MTLBuffer!
@@ -156,8 +155,8 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     }
     
     public func deleteEmptyDraws() {
-        for (i, draw) in objectDraws.enumerated() {
-            if draw.isEmpty() {
+        for i in 0 ..< objectDraws.count {
+            if objectDraws[i].isEmpty() {
                 objectDraws.remove(at: i)
             }
         }
@@ -259,66 +258,6 @@ public class SummerEngine : NSObject, MTKViewDelegate {
                             width: width, height: height,
                             texture: texture,
                             isVisible: isVisible)
-    }
-    
-    public func makeTexture(width: Int, height: Int, data: [UInt8]) -> SummerTexture {
-        return SummerTexture(self, width: width, height: height, data: data)
-    }
-    
-    public func makeTexture(width: Int, height: Int, data: [Float]) -> SummerTexture {
-        return SummerTexture(self, width: width, height: height, data: data)
-    }
-    
-    public func makeTexture(fromFile file: String,
-                            _ location: SummerFileLocation = .inFolder) -> SummerTexture? {
-        return SummerTexture(self, fromFile: file, location)
-    }
-    
-    public func makeTexture(fromFile file: String) -> SummerTexture? {
-        return SummerTexture(self, fromFile: file)
-    }
-    
-    public func makeColor(red: Float, green: Float, blue: Float, alpha: Float) -> SummerTexture {
-        return SummerTexture(self, width: 1, height: 1, data: [red, green, blue, alpha])
-    }
-    
-    public func makeDraw() -> SummerDraw { return SummerDraw(self) }
-    public func makeTransform() -> SummerTransform { return SummerTransform(self) }
-    
-    public func makeTileset(tileWidth: Int, tileHeight: Int, data: [[UInt8]]) -> SummerTileset {
-        return SummerTileset(self, tileWidth: tileWidth, tileHeight: tileHeight, data: data)
-    }
-    
-    public func makeTileset(tileWidth: Int, tileHeight: Int, data: [[Float]]) -> SummerTileset {
-        return SummerTileset(self, tileWidth: tileWidth, tileHeight: tileHeight, data: data)
-    }
-    
-    public func makeTileset(fromFiles files: [String], _ location: SummerFileLocation) -> SummerTileset? {
-        return SummerTileset(self, fromFiles: files, location)
-    }
-    
-    public func makeMap(width: Int, height: Int,
-                        data: [UInt32],
-                        tileset: SummerTileset,
-                        unitX: Float, unitY: Float,
-                        mapType: SummerMapType = .staticMap) -> SummerMap {
-        return SummerMap(self,
-                         width: width, height: height,
-                         data: data,
-                         tileset: tileset,
-                         unitX: unitX, unitY: unitY,
-                         mapType: mapType)
-    }
-    
-    public func makeMap(width: Int, height: Int,
-                        data: [UInt32],
-                        tileset: SummerTileset,
-                        mapType: SummerMapType = .staticMap) -> SummerMap {
-        return SummerMap(self,
-                         width: width, height: height,
-                         data: data,
-                         tileset: tileset,
-                         mapType: mapType)
     }
     
     public init(_ program: SummerProgram,

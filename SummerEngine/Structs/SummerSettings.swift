@@ -28,8 +28,8 @@ public struct SummerSettings {
     
     public var autoMakeTransformWithObject = false
     public var autoMakeDrawWithObject = false
+    public var autoMakeTranformWithMap = false
     
-    public var mergeDrawRanges = true
     public var conserveModifyMemory = false
     
     public var defaultTextureLocation = SummerFileLocation.inBundle

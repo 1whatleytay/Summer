@@ -14,6 +14,10 @@ public class SummerTexture {
     internal let x, y, width, height: Int
     internal let vertX1, vertX2, vertY1, vertY2: Float
     
+    public static func makeNil(_ parent: SummerEngine) -> SummerTexture {
+        return SummerTexture(parent, x: 0, y: 0, width: 0, height: 0)
+    }
+    
     public func getSize() -> (width: Int, height: Int) { return (width: width, height: height) }
     
     public static func getTextureData(fromFile file: String, _ location: SummerFileLocation) ->
@@ -135,8 +139,8 @@ public class SummerTexture {
     
     internal convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [Float]) {
         var subData = [UInt8](repeating: 0, count: data.count)
-        for (index, element) in data.enumerated() {
-            subData[index] = UInt8(element * 255)
+        for i in 0 ..< data.count {
+            subData[i] = UInt8(data[i] * 255)
         }
         
         self.init(parent, width: width, height: height, data: subData)

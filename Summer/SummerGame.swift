@@ -22,7 +22,7 @@ class SummerGame: SummerProgram {
         engine.settings.name = "Summer"
         engine.settings.verticalAmp = -1
         
-        colorRed = engine.makeTexture(fromFile: "fourty.png")
+        colorRed = engine.makeTexture(fromFile: "fourty.png", .inBundle)
         colorBlue = engine.makeColor(red: 0, green: 0, blue: 1, alpha: 1)
         colorGreen = engine.makeColor(red: 0, green: 1, blue: 0, alpha: 1)
         

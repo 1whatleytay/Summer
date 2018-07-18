@@ -18,7 +18,7 @@ public enum SummerMessage {
     case outOfObjectMemory
     case outOfTransformMemory
     case outOfTextureMemory
-    case inconsistentTextureSizes
     case couldNotCreateTileset
+    case couldNotLoadTileset
     case couldNotCreateMap
 }

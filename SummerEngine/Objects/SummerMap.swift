@@ -16,7 +16,7 @@ public class SummerMap {
     
     private let buffer: MTLBuffer!
     private let width, height: Int
-    private let mapType: SummerMapType
+    private let final : Bool
     
     public private(set) var tileset: SummerTileset
     public var transform: SummerTransform
@@ -34,8 +34,8 @@ public class SummerMap {
     
     private func getIndexInParent() -> Int {
         var indexFind = -1
-        for (i, map) in parent.maps.enumerated() {
-            if map === self { indexFind = i; break }
+        for i in 0 ..< parent.maps.count {
+            if parent.maps[i] === self { indexFind = i; break }
         }
         
         return indexFind
@@ -76,23 +76,13 @@ public class SummerMap {
                   tileset: SummerTileset,
                   transform: SummerTransform,
                   unitX: Float, unitY: Float,
-                  mapType: SummerMapType = .staticMap) {
+                  final: Bool = false) {
         self.parent = parent
         self.width = width
         self.height = height
         self.tileset = tileset
         self.transform = transform
-        self.mapType = mapType
-        
-        var options: MTLResourceOptions
-        switch mapType {
-        case .readonlyMap:
-            options = .storageModePrivate
-        case .staticMap:
-            options = .storageModeManaged
-        case .dynamicMap:
-            options = .storageModeShared
-        }
+        self.final = final
         
         var metadata: [UInt32] = [
             UInt32(width), UInt32(height),
@@ -104,9 +94,23 @@ public class SummerMap {
         
         metadata.append(contentsOf: data)
         
-        buffer = parent.device.makeBuffer(bytes: metadata,
-                                          length: SummerMap.metadataSize + width * height * 4,
-                                          options: options)
+        let bufferSize = SummerMap.metadataSize + width * height * 4
+        let tempBuffer = parent.device.makeBuffer(bytes: metadata,
+                                                  length: bufferSize,
+                                                  options: final ? .storageModeShared : .storageModeManaged)!
+        
+        if final {
+            buffer = parent.device.makeBuffer(length: bufferSize, options: .storageModePrivate)
+            if let commandBuffer = parent.commandQueue.makeCommandBuffer() {
+                if let blitEncoder = commandBuffer.makeBlitCommandEncoder() {
+                    blitEncoder.copy(from: tempBuffer, sourceOffset: 0, to: buffer, destinationOffset: 0, size: bufferSize)
+                    blitEncoder.endEncoding()
+                }
+                commandBuffer.commit()
+            }
+        } else {
+            buffer = tempBuffer
+        }
         
         if buffer == nil {
             parent.program.message(message: .couldNotCreateMap)
@@ -119,7 +123,7 @@ public class SummerMap {
                               data: [UInt32],
                               tileset: SummerTileset,
                               transform: SummerTransform,
-                              mapType: SummerMapType = .staticMap) {
+                              final: Bool = false) {
         self.init(parent,
                   width: width, height: height,
                   data: data,
@@ -127,7 +131,7 @@ public class SummerMap {
                   transform: transform,
                   unitX: 1 / parent.settings.horizontalUnit,
                   unitY: 1 / parent.settings.verticalUnit,
-                  mapType: mapType)
+                  final: final)
     }
     
     internal convenience init(_ parent: SummerEngine,
@@ -135,21 +139,21 @@ public class SummerMap {
                               data: [UInt32],
                               tileset: SummerTileset,
                               unitX: Float, unitY: Float,
-                              mapType: SummerMapType = .staticMap) {
+                              final: Bool = false) {
         self.init(parent,
                   width: width, height: height,
                   data: data,
                   tileset: tileset,
                   transform: parent.globalTransform,
                   unitX: unitX, unitY: unitY,
-                  mapType: mapType)
+                  final: final)
     }
     
     internal convenience init(_ parent: SummerEngine,
                               width: Int, height: Int,
                               data: [UInt32],
                               tileset: SummerTileset,
-                              mapType: SummerMapType = .staticMap) {
+                              final: Bool = false) {
         self.init(parent,
                   width: width, height: height,
                   data: data,
@@ -157,6 +161,72 @@ public class SummerMap {
                   transform: parent.globalTransform,
                   unitX: 1 / parent.settings.horizontalUnit,
                   unitY: 1 / parent.settings.verticalUnit,
-                  mapType: mapType)
+                  final: final)
+    }
+    
+    internal convenience init(_ parent: SummerEngine,
+                  width: Int, height: Int,
+                  data: [Int],
+                  tileset: SummerTileset,
+                  transform: SummerTransform,
+                  unitX: Float, unitY: Float,
+                  final: Bool = false) {
+        var subdata = [UInt32](repeating: 0, count: data.count)
+        
+        for i in 0 ..< data.count { subdata[i] = UInt32(data[i]) }
+        
+        self.init(parent,
+                  width: width, height: height,
+                  data: subdata,
+                  tileset: tileset,
+                  transform: transform,
+                  unitX: unitX, unitY: unitY,
+                  final: final)
+    }
+    
+    internal convenience init(_ parent: SummerEngine,
+                              width: Int, height: Int,
+                              data: [Int],
+                              tileset: SummerTileset,
+                              transform: SummerTransform,
+                              final: Bool = false) {
+        self.init(parent,
+                  width: width, height: height,
+                  data: data,
+                  tileset: tileset,
+                  transform: transform,
+                  unitX: 1 / parent.settings.horizontalUnit,
+                  unitY: 1 / parent.settings.verticalUnit,
+                  final: final)
+    }
+    
+    internal convenience init(_ parent: SummerEngine,
+                              width: Int, height: Int,
+                              data: [Int],
+                              tileset: SummerTileset,
+                              unitX: Float, unitY: Float,
+                              final: Bool = false) {
+        self.init(parent,
+                  width: width, height: height,
+                  data: data,
+                  tileset: tileset,
+                  transform: parent.globalTransform,
+                  unitX: unitX, unitY: unitY,
+                  final: final)
+    }
+    
+    internal convenience init(_ parent: SummerEngine,
+                              width: Int, height: Int,
+                              data: [Int],
+                              tileset: SummerTileset,
+                              final: Bool = false) {
+        self.init(parent,
+                  width: width, height: height,
+                  data: data,
+                  tileset: tileset,
+                  transform: parent.globalTransform,
+                  unitX: 1 / parent.settings.horizontalUnit,
+                  unitY: 1 / parent.settings.verticalUnit,
+                  final: final)
     }
 }

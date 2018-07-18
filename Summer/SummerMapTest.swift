@@ -22,13 +22,9 @@ class SummerMapTest: SummerProgram {
         
         engine.settings.verticalAmp = -1
         
-        tileset = engine.makeTileset(fromFiles: [
-            "/Users/desgroup/Desktop/heroes.png",
-            "/Users/desgroup/Desktop/review.png",
-            "/Users/desgroup/Desktop/thousand.png"
-            ], .inFolder)
+        tileset = engine.makeTileset(fromFiles: ["heroes.png", "review.png", "thousand.png"])
         
-        let mapData: [UInt32] = [
+        let mapData = [
             0, 0, 0, 1,
             1, 1, 1, 2,
             2, 0, 2, 0,
@@ -39,7 +35,7 @@ class SummerMapTest: SummerProgram {
                              data: mapData,
                              tileset: tileset,
                              unitX: 200, unitY: 200,
-                             mapType: .dynamicMap).withTransform()
+                             final: true).withTransform()
         
         map.transform.moveOffset(x: 100, y: 100)
         map.transform.setOrigin(x: 150, y: 150)

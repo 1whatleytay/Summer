@@ -10,13 +10,13 @@ import Foundation
 
 public struct SummerFeatures {
     public var maxObjects = 200
-    public var maxTransforms = 60
+    public var maxTransforms = 100
     public var textureAllocWidth = 1000, textureAllocHeight = 1000
     
-    public var staticPivot = false, staticTransform = false
+    public var staticPivot = true, staticTransform = false
     
     public var subscribeToEvents = true
-    public var transparency = false
+    public var transparency = true
     
     public var clearSettingsOnProgramSwap = false
     

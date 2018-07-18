@@ -8,7 +8,7 @@
 
 import Cocoa
 
-public class SummerObject {
+open class SummerObject {
     internal static let vertices = 6
     internal static let size = MemoryLayout<Float>.size * vertices * 4
     
@@ -19,6 +19,7 @@ public class SummerObject {
     
     public var x, y, width, height: Float
     public var texture: SummerTexture
+    public internal(set) var animation: SummerAnimation?
     
     public private(set) var isVisible: Bool
     
@@ -27,9 +28,9 @@ public class SummerObject {
     
     public static func allocate(_ parent: SummerEngine) -> Int {
         var indexFind = -1
-        for (index, alloc) in parent.objectAllocationData.enumerated() {
-            if !alloc {
-                indexFind = index
+        for i in 0 ..< parent.objectAllocationData.count {
+            if !parent.objectAllocationData[i] {
+                indexFind = i
                 break
             }
         }
@@ -79,6 +80,8 @@ public class SummerObject {
             modified = true
         }
     }
+    
+    public func setAnimation(animation: SummerAnimation) { animation.addObject(self) }
     
     public func setDraw(to newDraw: SummerDraw) {
         draw.removeIndex(index: objectId)
