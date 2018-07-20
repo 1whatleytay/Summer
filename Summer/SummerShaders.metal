@@ -69,14 +69,17 @@ vertex VertexOut mapVertexShader(uint vertexId [[vertex_id]],
                                  constant uint* metadata [[buffer(0)]],
                                  constant uint* mapData [[buffer(1)]],
                                  constant Transform* transform [[buffer(2)]]) {
+    // Get map metadata.
     uint mapWidth = metadata[MetadataFields::mapWidth];
     uint tilesetWidth = metadata[MetadataFields::tilesetWidth], tilesetHeight = metadata[MetadataFields::tilesetHeight];
     uint tileWidth = metadata[MetadataFields::tileWidth], tileHeight = metadata[MetadataFields::tileHeight];
     uint tilesX = metadata[MetadataFields::tilesX];
     uint bigUnitX = metadata[MetadataFields::bigUnitX], bigUnitY = metadata[MetadataFields::bigUnitY];
     
+    // Get transform.
     Transform t = *transform;
     
+    // Calculate locations and vertex locations.
     uint vertexType = vertexId % 6;
     uint tileId = vertexId / 6;
     uint tileData = mapData[tileId];
@@ -86,22 +89,26 @@ vertex VertexOut mapVertexShader(uint vertexId [[vertex_id]],
     float tileUnitX = tileWidth / (float)tilesetWidth;
     float tileUnitY = tileHeight / (float)tilesetHeight;
     
+    // Get a vertex location from the `vertexTypes` array.
     VertexOut vert = vertexTypes[vertexType];
     
+    // Adjust the tile location.
     vert.position.x += tileX;
     vert.position.y += tileY;
     
-    vert.position.x *= tileWidth;
-    vert.position.y *= tileHeight;
+//    vert.position.x *= tileWidth;
+//    vert.position.y *= tileHeight;
     
     vert.position.x = vert.position.x / bigUnitX * 2 - 1;
     vert.position.y = -(vert.position.y / bigUnitY * 2 - 1);
     
+    // Apply transform.
     float2 newPos = t.matrix * (vert.position.xy - t.origin) + t.origin + t.offset;
     
     vert.position.x = newPos.x;
     vert.position.y = newPos.y;
     
+    // Calculate texture location.
     vert.texCoord.x = (vert.texCoord.x + tilesetX) * tileUnitX;
     vert.texCoord.y = (vert.texCoord.y + tilesetY) * tileUnitY;
     

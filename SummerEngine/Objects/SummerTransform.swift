@@ -10,16 +10,18 @@ import Foundation
 import Metal
 import simd
 
+/// An object that contains information on different transformations.
 public class SummerTransform {
     internal static let size = MemoryLayout<simd_float2x2>.size + MemoryLayout<simd_float2>.size * 2
     internal static let pivotSize = MemoryLayout<UInt32>.size
     
-    public struct TransformData {
+    private struct SummerTransformData {
         private let parent: SummerEngine
         
         public var matrix = float2x2(simd_float2(1, 0), simd_float2(0, 1))
         
         public var offset: float2
+        
         public var origin: float2
         
         internal func data() -> [Float] {
@@ -48,9 +50,9 @@ public class SummerTransform {
     
     internal var modified = false
     
-    public var data: TransformData
+    private var data: SummerTransformData
     
-    public static func allocate(_ parent: SummerEngine) -> Int {
+    internal static func allocate(_ parent: SummerEngine) -> Int {
         var indexFind = -1
         for i in 0 ..< parent.transformAllocationData.count {
             if !parent.transformAllocationData[i] {
@@ -69,6 +71,7 @@ public class SummerTransform {
         parent.transformAllocationData[transformId] = true
     }
     
+    /// Saves all changes.
     public func save() {
         if transformId == -1 { return }
         
@@ -82,6 +85,7 @@ public class SummerTransform {
         parent.transformBuffer.didModifyRange(start..<end)
     }
     
+    /// Marks this object as changed. This object will be saved.
     public func commit() {
         if !modified {
             parent.addTransformModify(self)
@@ -104,18 +108,29 @@ public class SummerTransform {
         renderEncoder.setVertexBuffer(parent.transformBuffer, offset: SummerTransform.size * transformId, index: 2)
     }
     
+    /// Multiples a custom matrix to the current matrix.
+    ///
+    /// - Parameter matrix: The matrix to be multiplied.
     public func change(matrix: simd_float2x2) {
         data.matrix = matrix * data.matrix
         
         commit()
     }
     
+    /// Scales the matrix.
+    ///
+    /// - Parameters:
+    ///   - x: The horizontal scale factor.
+    ///   - y: The vertical scale factor.
     public func scale(x: Float, y: Float) {
         data.matrix = simd_float2x2(simd_float2(x, 0), simd_float2(0, y)) * data.matrix
         
         commit()
     }
     
+    /// Rotates the matrix.
+    ///
+    /// - Parameter degree: The amount of degrees to be rotated.
     public func rotate(degree: Float) {
         let radians = degree * Float.pi / 180
         
@@ -125,12 +140,18 @@ public class SummerTransform {
         commit()
     }
     
+    /// Resets the matrix.
     public func setIdentity() {
         data.matrix = simd_float2x2(simd_float2(1, 0), simd_float2(0, 1))
         
         commit()
     }
     
+    /// Moves the camera.
+    ///
+    /// - Parameters:
+    ///   - x: The amount of horizontal units to be moved.
+    ///   - y: The amount of vertical units to be moved.
     public func moveCamera(x: Float, y: Float) {
         data.offset.x -= x
         data.offset.y -= y
@@ -138,6 +159,11 @@ public class SummerTransform {
         commit()
     }
     
+    /// Sets the offset to a camera location.
+    ///
+    /// - Parameters:
+    ///   - x: The x coordinate of the camera.
+    ///   - y: The y coordinate of the camera.
     public func setCamera(x: Float, y: Float) {
         data.offset.x = -x
         data.offset.y = -y
@@ -145,6 +171,11 @@ public class SummerTransform {
         commit()
     }
     
+    /// Moves the offset.
+    ///
+    /// - Parameters:
+    ///   - x: The amount of horizontal units to be moved.
+    ///   - y: The amount of vertical units to be moved.
     public func moveOffset(x: Float, y: Float) {
         data.offset.x += x
         data.offset.y += y
@@ -152,6 +183,11 @@ public class SummerTransform {
         commit()
     }
     
+    /// Sets the offset.
+    ///
+    /// - Parameters:
+    ///   - x: The horizontal offset.
+    ///   - y: The vertical offset.
     public func setOffset(x: Float, y: Float) {
         data.offset.x = x
         data.offset.y = y
@@ -159,6 +195,11 @@ public class SummerTransform {
         commit()
     }
     
+    /// Sets the origin of the matrix.
+    ///
+    /// - Parameters:
+    ///   - x: The x coordinate of the origin.
+    ///   - y: The y coordinate of the origin.
     public func setOrigin(x: Float, y: Float) {
         data.origin.x = x
         data.origin.y = y
@@ -166,6 +207,7 @@ public class SummerTransform {
         commit()
     }
     
+    /// Frees all resources used by this transform.
     public func delete() {
         if transformId == -1 { return }
         
@@ -179,7 +221,7 @@ public class SummerTransform {
         self.transformId = transformId
         self.isGlobal = isGlobal
         
-        self.data = TransformData(parent)
+        self.data = SummerTransformData(parent)
         
         commit()
     }

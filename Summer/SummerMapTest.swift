@@ -34,13 +34,11 @@ class SummerMapTest: SummerProgram {
         map = engine.makeMap(width: 4, height: 4,
                              data: mapData,
                              tileset: tileset,
-                             unitX: 200, unitY: 200,
+                             unitX: 10, unitY: 10,
                              final: true).withTransform()
         
         map.transform.moveOffset(x: 100, y: 100)
         map.transform.setOrigin(x: 150, y: 150)
-        
-        map.setActive()
         
         myObject = engine.makeObject(x: 0, y: 0, width: 50, height: 50, texture: engine.makeTexture(fromFile: "fourty.png", .inBundle)!)
     }

@@ -6,8 +6,10 @@
 //  Copyright © 2018 Taylor Whatley. All rights reserved.
 //
 
-import Metal
-
+/// The location of a file path.
+///
+/// - inFolder: The file path is global.
+/// - inBundle: The file path is relative to the application.
 public enum SummerFileLocation {
     case inFolder
     case inBundle

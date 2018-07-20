@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Customizable animation for objects.
 public class SummerAnimation: NSObject {
     private let parent: SummerEngine
     
@@ -17,6 +18,7 @@ public class SummerAnimation: NSObject {
     private var timer: Timer!
     private var tick = 0
     
+    /// Moves the animation ahead a frame.
     public func step() {
         print(tick)
         tick += 1
@@ -26,11 +28,17 @@ public class SummerAnimation: NSObject {
     
     private func callStep(t: Timer) { step() }
     
+    /// Changes the rate of the animation.
+    ///
+    /// - Parameter rate: The new animation rate, in seconds.
     public func changeRate(newRate rate: Double) {
         timer.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: rate, repeats: true, block: callStep)
     }
     
+    /// Adds an object to be animated.
+    ///
+    /// - Parameter object: The object to be animated.
     public func addObject(_ object: SummerObject) {
         if object.animation === self { return }
         object.animation?.removeObject(object)
@@ -38,10 +46,14 @@ public class SummerAnimation: NSObject {
         objects.append(object)
     }
     
+    /// Removes an object. The object will no longer be animated.
+    ///
+    /// - Parameter object: The object to be removed.
     public func removeObject(_ object: SummerObject) {
         for i in 0 ..< objects.count {
             if objects[i] === object {
                 objects.remove(at: i)
+                object.animation = nil
             }
         }
     }

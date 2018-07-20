@@ -9,6 +9,7 @@
 import Foundation
 import Metal
 
+/// A class for handling groups of objects and the z-axis.
 public class SummerDraw {
     private let parent: SummerEngine?
     
@@ -36,6 +37,20 @@ public class SummerDraw {
         }
         
         return findLoc
+    }
+    
+    /// Activates the draw. The contents of the draw will be drawn.
+    public func setActive() {
+        let index = getIndexInParent()
+        
+        if index == -1 { parent?.objectDraws.append(self) }
+    }
+    
+    /// Deactivates the draw. The contents of the draw will no longer be drawn.
+    public func setDeactive() {
+        let index = getIndexInParent()
+        
+        if index != -1 { parent?.objectDraws.remove(at: index) }
     }
     
     private func mergeConcurrentRanges(rangeIndex: Int) {
@@ -101,8 +116,21 @@ public class SummerDraw {
         }
     }
     
+    /// Adds an object to the draw.
+    ///
+    /// - Parameter object: The object to add.
     public func addObject(object: SummerObject) { object.setDraw(to: self) }
     
+    /// Makes an object. The object will be part of this draw.
+    ///
+    /// - Parameters:
+    ///   - x: The x position of the object.
+    ///   - y: The y position of the object.
+    ///   - width: The width of the object.
+    ///   - height: The height of the object.
+    ///   - texture: The texture of the object.
+    ///   - isVisible: If false, the object will not be shown by default.
+    /// - Returns: A summer object.
     public func makeObject(
         x: Float, y: Float,
         width: Float, height: Float,
@@ -114,6 +142,9 @@ public class SummerDraw {
                             texture: texture)
     }
     
+    /// Moves this draw backwards in the z-axis.
+    ///
+    /// - Parameter amount: The amount of draws to move behind.
     public func moveBackwards(byAmount amount: UInt = 1) {
         let loc = getIndexInParent()
         if loc == -1 { return }
@@ -125,6 +156,9 @@ public class SummerDraw {
         objectDraws.insert(self, at: max(0, newLoc))
     }
     
+    /// Moves this draw forwards in the z-axis.
+    ///
+    /// - Parameter amount: The amount of draws to move ahead of.
     public func moveForward(byAmount amount: UInt = 1) {
         let loc = getIndexInParent()
         
@@ -139,6 +173,9 @@ public class SummerDraw {
         }
     }
     
+    /// Moves this draw behind another draw.
+    ///
+    /// - Parameter otherDraw: The draw to be moved behind of.
     public func moveBehind(draw otherDraw: SummerDraw) {
         let loc = getIndexInParent(), otherLoc = otherDraw.getIndexInParent()
         if loc == -1 || otherLoc == -1 { return }
@@ -150,6 +187,9 @@ public class SummerDraw {
         objectDraws.insert(self, at: max(0, newLoc))
     }
     
+    /// Moved this draw ahead of another draw.
+    ///
+    /// - Parameter otherDraw: The draw to be moved ahead of.
     public func moveAhead(draw otherDraw: SummerDraw) {
         let loc = getIndexInParent(), otherLoc = otherDraw.getIndexInParent()
         if loc == -1 || otherLoc == -1 { return }
@@ -165,6 +205,7 @@ public class SummerDraw {
         }
     }
     
+    /// Moves this draw to the furthest z-axis possible.
     public func moveToFurthest() {
         let loc = getIndexInParent()
         if loc == -1 { return }
@@ -173,6 +214,7 @@ public class SummerDraw {
         parent!.objectDraws.insert(self, at: 0)
     }
     
+    /// Moves this draw to the closest z-axis possible.
     public func moveToClosest() {
         let loc = getIndexInParent()
         if loc == -1 { return }
@@ -189,21 +231,10 @@ public class SummerDraw {
         }
     }
     
-    public func delete() {
-        if parent == nil { return }
-        
-        var findLoc = -1
-        for i in 0 ..< parent!.objectDraws.count {
-            if parent!.objectDraws[i] === self { findLoc = i }
-        }
-        
-        if findLoc != -1 { parent!.objectDraws.remove(at: findLoc) }
-    }
-    
     internal init(_ parent: SummerEngine?, isGlobal: Bool = false) {
         self.parent = parent
         self.isGlobal = isGlobal
         
-        parent?.objectDraws.append(self)
+        setActive()
     }
 }

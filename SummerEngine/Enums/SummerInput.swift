@@ -6,12 +6,23 @@
 //  Copyright © 2018 Taylor Whatley. All rights reserved.
 //
 
+/// Input states for keyboard and mouse.
+///
+/// - pressed: Button is pressed.
+/// - released: Button is released.
+/// - movement: Mouse is being moved.
 public enum SummerInputState {
     case pressed
     case released
     case movement
 }
 
+/// Mouse buttons.
+///
+/// - left: The left mouse button.
+/// - right: The right mouse button.
+/// - other: The middle mouse button.
+/// - movement: The mouse is being moved.
 public enum SummerMouseButton {
     case left
     case right
@@ -19,6 +30,122 @@ public enum SummerMouseButton {
     case movement
 }
 
+/// A key on the keyboard.
+///
+/// - vkA: The A key.
+/// - vkB: The B key.
+/// - vkC: The C key.
+/// - vkD: The D key.
+/// - vkE: The E key.
+/// - vkF: The F key.
+/// - vkG: The G key.
+/// - vkH: The H key.
+/// - vkI: The I key.
+/// - vkJ: The J key.
+/// - vkK: The K key.
+/// - vkL: The L key.
+/// - vkM: The M key.
+/// - vkN: The N key.
+/// - vkO: The O key.
+/// - vkP: The P key.
+/// - vkQ: The Q key.
+/// - vkR: The R key.
+/// - vkS: The S key.
+/// - vkT: The T key.
+/// - vkU: The U key.
+/// - vkV: The V key.
+/// - vkW: The W key.
+/// - vkX: The X key.
+/// - vkY: The Y key.
+/// - vkZ: The Z key.
+/// - vk1: The 1 key.
+/// - vk2: The 2 key.
+/// - vk3: The 3 key.
+/// - vk4: The 4 key.
+/// - vk5: The 5 key.
+/// - vk6: The 6 key.
+/// - vk7: The 7 key.
+/// - vk8: The 8 key.
+/// - vk9: The 9 key.
+/// - vk0: The 0 key.
+/// - vkEqual: The equals key.
+/// - vkMinus: The minus key.
+/// - vkLeftBracket: The left bracket key.
+/// - vkRightBracket: The right bracket key.
+/// - vkQuote: The quote key.
+/// - vkSemicolon: The semicolor key.
+/// - vkBackslash: The backslash key.
+/// - vkComma: The comma key.
+/// - vkSlash: The slash key.
+/// - vkPeriod: The period key.
+/// - vkGrave: The grave key.
+/// - vkKeypadDecimal: The keypad-decimal key.
+/// - vkKeypadPlus: The keypad-plus key.
+/// - vkKeypadMinus: The keypad-minus key.
+/// - vkKeypadMultiply: The keypad-muliply key.
+/// - vkKeypadDivide: The keypad-divide key.
+/// - vkKeypadEquals: The keypad-equals key.
+/// - vkKeypadEnter: The keypad-enter key.
+/// - vkKeypadClear: The keypad-clear key.
+/// - vkKeypad1: The keypad-1 key.
+/// - vkKeypad2: The keypad-2 key.
+/// - vkKeypad3: The keypad-3 key.
+/// - vkKeypad4: The keypad-4 key.
+/// - vkKeypad5: The keypad-5 key.
+/// - vkKeypad6: The keypad-6 key.
+/// - vkKeypad7: The keypad-7 key.
+/// - vkKeypad8: The keypad-8 key.
+/// - vkKeypad9: The keypad-9 key.
+/// - vkKeypad0: The keypad-0 key.
+/// - vkReturn: The keypad-return key.
+/// - vkTab: The tab key.
+/// - vkSpace: The space key.
+/// - vkDelete: The delete key.
+/// - vkEscape: The escape key.
+/// - vkCommand: The command key.
+/// - vkShift: The shift key.
+/// - vkCapsLock: The caps lock key.
+/// - vkOption: The option key.
+/// - vkControl: The control key.
+/// - vkRightCommand: The right command key.
+/// - vkRightShift: The right shift key.
+/// - vkRightOption: The right option key.
+/// - vkRightControl: The right control key.
+/// - vkFunction: The function key.
+/// - vkForwardDelete: The forward delete key.
+/// - vkLeft: The left key.
+/// - vkRight: The right key.
+/// - vkUp: The up key.
+/// - vkDown: The down key.
+/// - vkVolumeUp: The volume up key.
+/// - vkVolumeDown: The volume down key.
+/// - vkMute: The mute key.
+/// - vkPageUp: The page up key.
+/// - vkPageDown: The page down key.
+/// - vkHelp: The help key.
+/// - vkHome: The homekey
+/// - vkEnd: The end key.
+/// - vkF1: The F1 key.
+/// - vkF2: The F2 key.
+/// - vkF3: The F3 key.
+/// - vkF4: The F4 key.
+/// - vkF5: The F5 key.
+/// - vkF6: The F6 key.
+/// - vkF7: The F7 key.
+/// - vkF8: The F8 key.
+/// - vkF9: The F9 key.
+/// - vkF10: The F10 key.
+/// - vkF11: The F11 key.
+/// - vkF12: The F12 key.
+/// - vkF13: The F13 key.
+/// - vkF14: The F14 key.
+/// - vkF15: The F15 key.
+/// - vkF16: The F16 key.
+/// - vkF17: The F17 key.
+/// - vkF18: The F18 key.
+/// - vkF19: The F19 key.
+/// - vkF20: The F20 key.
+/// - vkUnknown: An unknown key was pressed.
 public enum SummerKey: UInt16 {
     case vkA = 0x00
     case vkB = 0x0B
@@ -76,8 +203,8 @@ public enum SummerKey: UInt16 {
     case vkKeypadDecimal = 0x41
     case vkKeypadPlus = 0x45
     case vkKeypadMinus = 0x4E
-    case vkKeypadDivide = 0x4B
     case vkKeypadMultiply = 0x43
+    case vkKeypadDivide = 0x4B
     case vkKeypadEquals = 0x51
     case vkKeypadEnter = 0x4C
     case vkKeypadClear = 0x47
@@ -147,5 +274,5 @@ public enum SummerKey: UInt16 {
     case vkF19 = 0x50
     case vkF20 = 0x5A
     
-    case vkUnknown = 0xFF
+    case vkUnknown = 0xFE
 }

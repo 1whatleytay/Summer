@@ -9,17 +9,27 @@
 import Metal
 import AppKit
 
+/// Represents an image that can be shown on screen.
 public class SummerTexture {
     private let parent: SummerEngine
     internal let x, y, width, height: Int
     internal let vertX1, vertX2, vertY1, vertY2: Float
     
-    public static func makeNil(_ parent: SummerEngine) -> SummerTexture {
+    internal static func makeNil(_ parent: SummerEngine) -> SummerTexture {
         return SummerTexture(parent, x: 0, y: 0, width: 0, height: 0)
     }
     
+    /// Gets the size of the image.
+    ///
+    /// - Returns: A tuple containing the width and height of the image.
     public func getSize() -> (width: Int, height: Int) { return (width: width, height: height) }
     
+    /// Gathers information about an image file.
+    ///
+    /// - Parameters:
+    ///   - file: A path to an image file.
+    ///   - location: The location of the image file. .inBundle for relative, .inFolder for global.
+    /// - Returns: A tuple containing the image size and pixel data.
     public static func getTextureData(fromFile file: String, _ location: SummerFileLocation) ->
         (width: Int, height: Int, data: [Float])? {
             var imageData: [Float]
@@ -92,6 +102,15 @@ public class SummerTexture {
         }
     }
     
+    /// Samples an image within this texture.
+    /// Do not delete sampled textures as this will also delete the space in the parent texture.
+    ///
+    /// - Parameters:
+    ///   - x: The relative x location in this texture (in pixels).
+    ///   - y: The relative y location in this texture (in pixels).
+    ///   - width: The width of the sampled texture (in pixels).
+    ///   - height: The height of the sampled texture (in pixels).
+    /// - Returns: The texture object that was sampled.
     public func sample(x: Int, y: Int, width: Int, height: Int) -> SummerTexture? {
         if x + width > self.x + self.width || y + height > self.y + self.height { return nil }
         return SummerTexture(parent,
@@ -99,6 +118,7 @@ public class SummerTexture {
                              width: self.width + width, height: self.height + height)
     }
     
+    /// Frees all resources used by this texture.
     public func delete() {
         for sX in 0 ..< width {
             for sY in 0 ..< height {

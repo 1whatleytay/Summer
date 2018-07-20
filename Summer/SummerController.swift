@@ -28,13 +28,12 @@ class SummerController: NSViewController {
         settings.verticalAmp = -1
         
         do {
-            engine = try SummerEngine(SummerAnimTest(), view: summerView, features: features, settings: settings)
+            engine = try SummerEngine(SummerMapTest(), view: summerView, features: features, settings: settings)
         } catch let e {
             switch e {
             case SummerError.cannotCreateDevice: print("Cannot create device!")
-            case SummerError.cannotCreateQueue: print("Cannot create queue!")
             case SummerError.noDefaultLibrary: print("No default library provided!")
-            case SummerError.cannotCreatePipelineState: print("Cannot create pipeline state!")
+            case SummerError.cannotCreateResources: print("Cannot create resources!")
             default: print("Too lazy to handle this error :/")
             }
         }

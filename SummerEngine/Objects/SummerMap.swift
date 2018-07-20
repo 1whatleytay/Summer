@@ -9,6 +9,7 @@
 import Foundation
 import Metal
 
+/// Allows for drawing repitive patterns with much less memory.
 public class SummerMap {
     internal static let metadataSize = MemoryLayout<UInt32>.size * 10
     
@@ -18,7 +19,9 @@ public class SummerMap {
     private let width, height: Int
     private let final : Bool
     
+    /// The used tileset.
     public private(set) var tileset: SummerTileset
+    /// The used transform.
     public var transform: SummerTransform
     
     internal func setResources(_ renderEncoder: MTLRenderCommandEncoder) {
@@ -41,18 +44,23 @@ public class SummerMap {
         return indexFind
     }
     
+    /// Activates the map. The map will now be drawn.
     public func setActive() {
         let index = getIndexInParent()
         
         if index == -1 { parent.maps.append(self) }
     }
     
+    /// Deactivates the map. The map will no longer be drawn.
     public func setDeactive() {
         let index = getIndexInParent()
         
         if index != -1 { parent.maps.remove(at: index) }
     }
     
+    /// Creates a new transform.
+    ///
+    /// - Returns: The transform that was created.
     public func makeTransform() -> SummerTransform {
         let newTransform = parent.makeTransform()
         transform = newTransform
@@ -60,12 +68,19 @@ public class SummerMap {
         return newTransform
     }
     
+    /// Sets the current transform.
+    ///
+    /// - Parameter newTransform: The new transform to be set.
+    /// - Returns: Self.
     public func withTransform(transform newTransform: SummerTransform) -> SummerMap {
         transform = newTransform
         
         return self
     }
     
+    /// Creates a new transform.
+    ///
+    /// - Returns: Self.
     public func withTransform() -> SummerMap {
         return withTransform(transform: parent.makeTransform())
     }
@@ -116,6 +131,8 @@ public class SummerMap {
             parent.program.message(message: .couldNotCreateMap)
             return
         }
+        
+        setActive()
     }
     
     internal convenience init(_ parent: SummerEngine,

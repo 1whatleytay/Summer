@@ -9,6 +9,7 @@
 import Foundation
 import Metal
 
+/// Keeps track of multiple tiles to be used in a map.
 public class SummerTileset {
     private let parent: SummerEngine
     
@@ -16,6 +17,12 @@ public class SummerTileset {
     internal let tileWidth, tileHeight: Int
     internal let width, height: Int
     
+    /// Gathers information about multiple image files.
+    ///
+    /// - Parameters:
+    ///   - files: An array of paths to image files.
+    ///   - location: The location of the image files. .inBundle for relative, .inFolder for global.
+    /// - Returns: A tuple containing information of each file as an array.
     public static func getTilesetData(fromFiles files: [String], _ location: SummerFileLocation)
         -> (tileWidths: [Int], tileHeights: [Int], data: [[Float]])? {
             if files.count < 1 { return nil }

@@ -8,15 +8,15 @@
 
 import Foundation
 
+/// An enum of errors that can be thrown while creating a SummerEngine object.
+///
+/// - cannotCreateDevice: Could not create a metal device on this platform.
+/// - cannotCreateResources: Could not create metal resources.
+/// - noDefaultLibrary: Could not find a default library.
+/// - viewInUse: The view object is already in use by another SummerEngine.
 public enum SummerError: Error {
     case cannotCreateDevice
-    case cannotCreateQueue
+    case cannotCreateResources
     case noDefaultLibrary
-    case cannotCreatePipelineState
-    case cannotCreateMapPipelineState
-    case cannotCreateObjectBuffer
-    case cannotCreateTransformBuffer
-    case cannotCreatePivotBuffer
-    case cannotCreateTexture
     case viewInUse
 }
