@@ -37,7 +37,7 @@ public struct SummerSettings {
     /// A factor that can flip or stretch objects horizontally.
     public var horizontalAmp: Float = 1
     /// A factor that can flip or stretch objects vertically.
-    public var verticalAmp: Float = 1
+    public var verticalAmp: Float = -1
     
     /// If true, all objects will be deleted when their deinitializer is called.
     public var deleteObjectsOnDealloc = false
@@ -61,6 +61,9 @@ public struct SummerSettings {
     
     /// If true, SummerEngine will print allocation messages.
     public var debugPrintAllocationMessages = false
+    
+    /// Handles messages like failures and warnings.
+    public var messageHandler: ((SummerMessage) -> Void)? = nil
     
     /// Constructor.
     public init() { }

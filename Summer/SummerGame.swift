@@ -19,10 +19,9 @@ class SummerGame: SummerProgram {
     func setup(engine: SummerEngine) {
         self.engine = engine
         
-        engine.settings.name = "Summer"
-        engine.settings.verticalAmp = -1
+        engine.settings.messageHandler = { message in print(message) }
         
-        colorRed = engine.makeTexture(fromFile: "fourty.png", .inBundle)
+        colorRed = engine.makeTexture(fromFile: "fourty.png")
         colorBlue = engine.makeColor(red: 0, green: 0, blue: 1, alpha: 1)
         colorGreen = engine.makeColor(red: 0, green: 1, blue: 0, alpha: 1)
         
@@ -39,17 +38,6 @@ class SummerGame: SummerProgram {
         blue.save()
         
         red.transform.rotate(degree: 1)
-    }
-    
-    func message(message: SummerMessage) {
-        switch message {
-        case .couldNotFindTexture:
-            print("Could not find texture.")
-            engine.abort()
-            exit(1)
-        default:
-            break
-        }
     }
     
     func key(key: SummerKey, characters: String?, state: SummerInputState) {
@@ -94,17 +82,9 @@ class SummerMenu: SummerProgram {
         obj.move(x: 1, y: 0)
     }
     
-    func message(message: SummerMessage) {
-        print(message)
-    }
+    func key(key: SummerKey, characters: String?, state: SummerInputState) { }
     
-    func key(key: SummerKey, characters: String?, state: SummerInputState) {
-        
-    }
-    
-    func mouse(button: SummerMouseButton, x: Double, y: Double, state: SummerInputState) {
-        
-    }
+    func mouse(button: SummerMouseButton, x: Double, y: Double, state: SummerInputState) { }
     
     init(_ obj: SummerObject) {
         self.obj = obj

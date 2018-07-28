@@ -126,9 +126,10 @@ extension SummerEngine {
     ///   - tileWidth: The width of each tile.
     ///   - tileHeight: The height of each tile.
     ///   - data: A 2D array containing the bytes for each tile.
+    ///   - alloc: The amount of extra space (in tiles) to allocate.
     /// - Returns: A tileset object.
-    public func makeTileset(tileWidth: Int, tileHeight: Int, data: [[UInt8]]) -> SummerTileset {
-        return SummerTileset(self, tileWidth: tileWidth, tileHeight: tileHeight, data: data)
+    public func makeTileset(tileWidth: Int, tileHeight: Int, data: [[UInt8]], alloc: Int = 0) -> SummerTileset {
+        return SummerTileset(self, tileWidth: tileWidth, tileHeight: tileHeight, data: data, alloc: alloc)
     }
     
     /// Makes a tileset out of the given components.
@@ -137,9 +138,10 @@ extension SummerEngine {
     ///   - tileWidth: The width of each tile.
     ///   - tileHeight: The height of each tile.
     ///   - data: A 2D array containing the RGBA components of each tile.
+    ///   - alloc: The amount of extra space (in tiles) to allocate.
     /// - Returns: A tileset object.
-    public func makeTileset(tileWidth: Int, tileHeight: Int, data: [[Float]]) -> SummerTileset {
-        return SummerTileset(self, tileWidth: tileWidth, tileHeight: tileHeight, data: data)
+    public func makeTileset(tileWidth: Int, tileHeight: Int, data: [[Float]], alloc: Int = 0) -> SummerTileset {
+        return SummerTileset(self, tileWidth: tileWidth, tileHeight: tileHeight, data: data, alloc: alloc)
     }
     
     /// Makes a tileset out the given files.
@@ -147,17 +149,20 @@ extension SummerEngine {
     /// - Parameters:
     ///   - files: An array of file paths to files containing image data.
     ///   - location: An optional parameter to determine if the path is relative (.inBundle) or global (.inFolder).
+    ///   - alloc: The amount of extra space (in tiles) to allocate.
     /// - Returns: A tileset object.
-    public func makeTileset(fromFiles files: [String], _ location: SummerFileLocation) -> SummerTileset? {
-        return SummerTileset(self, fromFiles: files, location)
+    public func makeTileset(fromFiles files: [String], _ location: SummerFileLocation, alloc: Int = 0) -> SummerTileset? {
+        return SummerTileset(self, fromFiles: files, location, alloc: alloc)
     }
     
     /// Makes a tileset out of the given files.
     ///
-    /// - Parameter files: An array of file paths to files containing image data.
+    /// - Parameters:
+    ///   - files: An array of file paths to files containing image data.
+    ///   - alloc: The amount of extra space (in tiles) to allocate.
     /// - Returns: A tileset object.
-    public func makeTileset(fromFiles files: [String]) -> SummerTileset? {
-        return SummerTileset(self, fromFiles: files)
+    public func makeTileset(fromFiles files: [String], alloc: Int = 0) -> SummerTileset? {
+        return SummerTileset(self, fromFiles: files, alloc: alloc)
     }
     
     /// Makes a map.

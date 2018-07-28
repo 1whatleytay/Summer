@@ -20,7 +20,7 @@ class SummerMapTest: SummerProgram {
     func setup(engine: SummerEngine) {
         self.engine = engine
         
-        engine.settings.verticalAmp = -1
+        engine.settings.messageHandler = { message in print(message) }
         
         tileset = engine.makeTileset(fromFiles: ["heroes.png", "review.png", "thousand.png"])
         
@@ -34,28 +34,23 @@ class SummerMapTest: SummerProgram {
         map = engine.makeMap(width: 4, height: 4,
                              data: mapData,
                              tileset: tileset,
-                             unitX: 10, unitY: 10,
-                             final: true).withTransform()
+                             unitX: 10, unitY: 10)
         
-        map.transform.moveOffset(x: 100, y: 100)
-        map.transform.setOrigin(x: 150, y: 150)
-        
-        myObject = engine.makeObject(x: 0, y: 0, width: 50, height: 50, texture: engine.makeTexture(fromFile: "fourty.png", .inBundle)!)
+        myObject = engine.makeObject(x: 0, y: 0, width: 50, height: 50, texture: engine.makeTexture(fromFile: "fourty.png")!).withTransform()
     }
     
-    func update() {
-        if (engine.isKeyPressed(key: .vkW)) { myObject.move(x: 0, y: -1) }
-        if (engine.isKeyPressed(key: .vkA)) { myObject.move(x: -1, y: 0) }
-        if (engine.isKeyPressed(key: .vkS)) { myObject.move(x: 0, y: 1) }
-        if (engine.isKeyPressed(key: .vkD)) { myObject.move(x: 1, y: 0) }
-    }
-    
-    func message(message: SummerMessage) {
-        print(message)
-    }
+    func update() { }
     
     func key(key: SummerKey, characters: String?, state: SummerInputState) {
-        
+        if state == .pressed {
+            if key == .vkUp {
+                SummerTransform.value += 1
+                print(SummerTransform.value)
+            } else if key == .vkDown {
+                SummerTransform.value -= 1
+                print(SummerTransform.value)
+            }
+        }
     }
     
     func mouse(button: SummerMouseButton, x: Double, y: Double, state: SummerInputState) {

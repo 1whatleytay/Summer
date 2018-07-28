@@ -31,16 +31,19 @@ import MetalKit
     - Multiple Maps and Transform Maps
     - Animation Groups (Part of the main texture)
     - Documentation
+    - Modify Textures
  
  Cool Features:
-    - Modify Textures
     - Single File Tileset Loading (GIF and Tileset Image)
     - Combined Transforms
     - Buttons and Events
     - Batch Tileset/Animation loading
+    - Opacity Transforms?
+    - Make Object Constructors Dedicated (so overriding works well)
  
  Just in case I forget:
     - Allow passing an animation instead of a texture SummerObject.
+    - Clear Object/Transform space on delete in SummerFeatures
  
  Fixes:
     - Mouse flipping should not be using Units (exclusively, mostly Amps) and should be applied to x and y
@@ -73,32 +76,43 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     private var objectModifyQueue = [SummerObject]()
     private var transformModifyQueue = [SummerTransform]()
     
-    internal var disposables = [SummerObject]()
+    internal var objectDisposables = Queue<SummerObject>()
+    internal var transformDisposables = Queue<SummerTransform>()
     
     /// By default, an object uses this draw.
     public private(set) var globalDraw: SummerDraw!
     /// By default, an object uses this transform.
     public private(set) var globalTransform: SummerTransform!
-    internal let objectDraws = LinkedList<SummerDraw>()
     
     private let mapPipelineState: MTLRenderPipelineState
     internal var maps = [SummerMap]()
+    internal let draws = LinkedList<SummerDraw>()
+    
+    public var beforeUpdateEvents = [() -> Void]()
+    public var afterUpdateEvents = [() -> Void]()
     
     private var isAborting = false
     /// Halts the engine and the program.
     public func abort() {
-        program.message(message: .aborting)
+        settings.messageHandler?(.aborting)
         isAborting = true
     }
     
     internal func addObjectModify(_ object: SummerObject) { objectModifyQueue.append(object) }
     internal func addTransformModify(_ transform: SummerTransform) { transformModifyQueue.append(transform) }
     
-    internal func clearDisposables() -> Bool {
-        if disposables.count <= 0 { return false }
+    internal func clearObjectSpace() -> Bool {
+        if objectDisposables.isEmpty { return false }
         
-        for object in disposables { object.delete() }
-        disposables.removeAll()
+        objectDisposables.dequeue()?.delete()
+        
+        return true
+    }
+    
+    internal func clearTransformSpace() -> Bool {
+        if transformDisposables.isEmpty { return false }
+        
+        transformDisposables.dequeue()?.delete()
         
         return true
     }
@@ -134,6 +148,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
             view.delegate = nil
             return
         }
+        for event in beforeUpdateEvents { event() }
         program.update()
         dequeueModifies()
         if let commandBuffer = commandQueue.makeCommandBuffer() {
@@ -153,7 +168,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
                 renderEncoder.setVertexBuffer(pivotBuffer, offset: 0, index: 2)
                 renderEncoder.setFragmentTexture(texture, index: 0)
                 globalDraw.addDraws(encoder: renderEncoder)
-                for draw in objectDraws { draw.addDraws(encoder: renderEncoder) }
+                for draw in draws { draw.addDraws(encoder: renderEncoder) }
                 
                 renderEncoder.endEncoding()
             }
@@ -161,6 +176,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
             commandBuffer.present(view.currentDrawable!)
             commandBuffer.commit()
         }
+        for event in afterUpdateEvents { event() }
     }
     
     /// Changes the engine setting's display size to the view's size in points.
@@ -177,25 +193,31 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     
     /// Deletes all draws that do not contain an object.
     public func deleteEmptyDraws() {
-        for i in 0 ..< objectDraws.count {
-            if objectDraws[i].isEmpty() {
-                objectDraws.remove(at: i)
+        for i in 0 ..< draws.count {
+            if draws[i].isEmpty() {
+                draws.remove(at: i)
             }
         }
+    }
+    
+    /// Removes all disposable objects and transforms.
+    public func clearDisposables() {
+        for _ in 0 ..< objectDisposables.count { objectDisposables.dequeue()?.delete() }
+        for _ in 0 ..< transformDisposables.count { transformDisposables.dequeue()?.delete() }
     }
     
     /// Frees all allocations. All objects, textures, draws, etc. may be overwritten.
     public func freeAllocations() {
         objectAllocationData = [Bool](repeating: false, count: features.maxObjects)
-        transformAllocationData = [Bool](repeating: false, count: features.maxTransforms)
+        transformAllocationData = [Bool](repeating: false, count: features.maxTransforms + 1)
         textureAllocationData = [Bool](repeating: false,
                                        count: features.textureAllocWidth * features.textureAllocHeight)
         
         globalDraw = SummerDraw(nil)
         globalTransform = SummerTransform(self)
-        objectDraws.removeAll()
+        draws.removeAll()
         maps.removeAll()
-        disposables.removeAll()
+        clearDisposables()
     }
     
     /// Frees all allocations except for certain objects passed in arrays.
@@ -213,6 +235,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         
         for texture in keepTextures { texture.allocate() }
         for object in keepObjects {
+            if object.isDisposable { continue }
             object.allocate()
             object.texture.allocate()
             // Kou-chan will remember this.
@@ -224,10 +247,10 @@ public class SummerEngine : NSObject, MTKViewDelegate {
             if object.draw.isGlobal {
                 globalDraw.addObject(object: object)
             } else {
-                objectDraws.append(object.draw)
+                draws.append(object.draw)
             }
         }
-        for draw in keepDraws { objectDraws.append(draw) }
+        for draw in keepDraws { draws.append(draw) }
         for transform in keepTransforms { transform.allocate() }
     }
     
@@ -249,7 +272,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         }
         
         program = newProgram
-        program.message(message: .swapping)
+        settings.messageHandler?(.swapping)
         program.setup(engine: self)
         
         return oldProgram
@@ -338,7 +361,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         self.settings = settings
         view = nView
         
-        program.message(message: .starting)
+        settings.messageHandler?(.starting)
         
         device = MTLCreateSystemDefaultDevice()
         if device == nil { throw SummerError.cannotCreateDevice }
@@ -396,7 +419,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         objectBuffer = device.makeBuffer(length: SummerObject.size * features.maxObjects)
         if objectBuffer == nil { throw SummerError.cannotCreateResources }
         
-        transformBuffer = device.makeBuffer(length: SummerTransform.size * features.maxTransforms,
+        transformBuffer = device.makeBuffer(length: SummerTransform.size * features.maxTransforms + 1,
                                             options: features.staticTransform ? .storageModeManaged : .storageModeShared)
         if transformBuffer == nil { throw SummerError.cannotCreateResources }
         
@@ -413,7 +436,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         if texture == nil { throw SummerError.cannotCreateResources }
         
         objectAllocationData = [Bool](repeating: false, count: features.maxObjects)
-        transformAllocationData = [Bool](repeating: false, count: features.maxTransforms)
+        transformAllocationData = [Bool](repeating: false, count: features.maxTransforms + 1)
         textureAllocationData = [Bool](repeating: false,
                                        count: features.textureAllocWidth * features.textureAllocHeight)
         
@@ -428,6 +451,6 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         autoDetectUnitSize()
         
         program.setup(engine: self)
-        program.message(message: .looping)
+        settings.messageHandler?(.looping)
     }
 }

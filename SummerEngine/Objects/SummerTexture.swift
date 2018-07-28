@@ -118,6 +118,22 @@ public class SummerTexture {
                              width: self.width + width, height: self.height + height)
     }
     
+    /// Edits a region of the texture.
+    ///
+    /// - Parameters:
+    ///   - x: The x coordinate of the texture to be replaced.
+    ///   - y: The y coordinate of the texture to be replaced.
+    ///   - replaceWidth: The width of the replacement.
+    ///   - replaceHeight: The height of the replacement.
+    ///   - data: The data to replace the region.
+    public func edit(x: Int, y: Int, replaceWidth: Int, replaceHeight: Int, data: [UInt8]) {
+        if x < 0 || y < 0 || width < 0 || height < 0 { return }
+        if x + width > self.width || y + height > self.height { return }
+        
+        parent.texture.replace(region: MTLRegionMake2D(self.x + x, self.y + y, width, height),
+                               mipmapLevel: 0, withBytes: data, bytesPerRow: width * 4)
+    }
+    
     /// Frees all resources used by this texture.
     public func delete() {
         for sX in 0 ..< width {
@@ -147,7 +163,7 @@ public class SummerTexture {
         let pos = SummerTexture.allocate(parent, width: width, height: height)
         
         if pos.x == -1 {
-            parent.program.message(message: .outOfTextureMemory)
+            parent.settings.messageHandler?(.outOfTextureMemory)
         } else {
             parent.texture.replace(region: MTLRegionMake2D(pos.x, pos.y, width, height), mipmapLevel: 0, withBytes: data, bytesPerRow: width * 4)
         }

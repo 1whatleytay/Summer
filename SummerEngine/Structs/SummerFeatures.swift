@@ -13,7 +13,7 @@ public struct SummerFeatures {
     /// The maximum amount of objects.
     public var maxObjects = 200
     /// The maximum amount of transforms.
-    public var maxTransforms = 100
+    public var maxTransforms = 200
     /// The allocation width of the main texture.
     public var textureAllocWidth = 1000
     /// The allocation height of the main texture.

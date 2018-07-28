@@ -109,7 +109,7 @@ open class SummerObject {
     public func setDisposable() {
         if !isDisposable {
             isDisposable = true
-            parent.disposables.append(self)
+            parent.objectDisposables.enqueue(self)
         }
     }
     
@@ -269,7 +269,7 @@ open class SummerObject {
     }
     
     /// Frees all resources used by this object.
-    public func delete() {
+    open func delete() {
         if objectId == -1 { return }
         
         draw.removeIndex(index: objectId)
@@ -278,13 +278,36 @@ open class SummerObject {
     
     deinit { if parent.settings.deleteObjectsOnDealloc { delete() } }
     
-    private init(_ parent: SummerEngine, objectId: Int,
-                 draw: SummerDraw,
-                 transform: SummerTransform,
-                 x: Float, y: Float,
-                 width: Float, height: Float,
-                 texture: SummerTexture,
-                 isVisible: Bool = true) {
+    /// Constructor.
+    /// Please use SummerEngine.makeObject() for creating raw objects.
+    /// This constructor is for creating subclasses.
+    ///
+    /// - Parameters:
+    ///   - parent: The parent engine.
+    ///   - draw: The parent draw.
+    ///   - transform: The transform of the object.
+    ///   - x: The x position of the object.
+    ///   - y: The y position of the object.
+    ///   - width: The width of the object.
+    ///   - height: The height of the object.
+    ///   - texture: The texture of the object.
+    ///   - isVisible: If false, the object will not be shown by default.
+    public init(_ parent: SummerEngine,
+                            draw: SummerDraw,
+                            transform: SummerTransform,
+                            x: Float, y: Float,
+                            width: Float, height: Float,
+                            texture: SummerTexture,
+                            isVisible: Bool = true) {
+        var objectId = SummerObject.allocate(parent)
+        
+        if objectId == -1 {
+            let success = parent.clearObjectSpace()
+            
+            if success { objectId = SummerObject.allocate(parent) }
+            else { parent.settings.messageHandler?(.outOfObjectMemory) }
+        }
+        
         self.parent = parent
         self.objectId = objectId
         
@@ -302,46 +325,7 @@ open class SummerObject {
         self.transform = parent.globalTransform
         transform.pivot(objectId: objectId)
         
-        commit()
-    }
-    
-    /// Constructor.
-    /// Please use SummerEngine.makeObject() for creating raw objects.
-    /// This constructor is for creating subclasses.
-    ///
-    /// - Parameters:
-    ///   - parent: The parent engine.
-    ///   - draw: The parent draw.
-    ///   - transform: The transform of the object.
-    ///   - x: The x position of the object.
-    ///   - y: The y position of the object.
-    ///   - width: The width of the object.
-    ///   - height: The height of the object.
-    ///   - texture: The texture of the object.
-    ///   - isVisible: If false, the object will not be shown by default.
-    public convenience init(_ parent: SummerEngine,
-                            draw: SummerDraw,
-                            transform: SummerTransform,
-                            x: Float, y: Float,
-                            width: Float, height: Float,
-                            texture: SummerTexture,
-                            isVisible: Bool = true) {
-        var objectId = SummerObject.allocate(parent)
-        
-        if objectId == -1 {
-            let success = parent.clearDisposables()
-            
-            if success { objectId = SummerObject.allocate(parent) }
-            else { parent.program.message(message: .outOfObjectMemory) }
-        }
-        
-        self.init(parent, objectId: objectId,
-                  draw: draw,
-                  transform: transform,
-                  x: x, y: y,
-                  width: width, height: height,
-                  texture: texture,
-                  isVisible: isVisible)
+        save()
         
         allocate()
     }
@@ -359,7 +343,7 @@ open class SummerObject {
     ///   - height: The height of the object.
     ///   - texture: The texture of the object.
     ///   - isVisible: If false, the object will not be shown by default.
-    public convenience init(_ parent: SummerEngine,
+    internal convenience init(_ parent: SummerEngine,
                             draw: SummerDraw,
                             x: Float, y: Float,
                             width: Float, height: Float,
@@ -387,7 +371,7 @@ open class SummerObject {
     ///   - height: The height of the object.
     ///   - texture: The texture of the object.
     ///   - isVisible: If false, the object will not be shown by default.
-    public convenience init(_ parent: SummerEngine,
+    internal convenience init(_ parent: SummerEngine,
                             transform: SummerTransform,
                             x: Float, y: Float,
                             width: Float, height: Float,
@@ -414,7 +398,7 @@ open class SummerObject {
     ///   - height: The height of the object.
     ///   - texture: The texture of the object.
     ///   - isVisible: If false, the object will not be shown by default.
-    public convenience init(_ parent: SummerEngine,
+    internal convenience init(_ parent: SummerEngine,
                             x: Float, y: Float,
                             width: Float, height: Float,
                             texture: SummerTexture,
@@ -442,7 +426,7 @@ open class SummerObject {
     ///   - height: The height of the object.
     ///   - animation: The animation that will be animating this object.
     ///   - isVisible: If false, the object will not be shown by default.
-    public convenience init(_ parent: SummerEngine,
+    internal convenience init(_ parent: SummerEngine,
                             draw: SummerDraw,
                             transform: SummerTransform,
                             x: Float, y: Float,
@@ -473,7 +457,7 @@ open class SummerObject {
     ///   - height: The height of the object.
     ///   - animation: The animation that will be animating this object.
     ///   - isVisible: If false, the object will not be shown by default.
-    public convenience init(_ parent: SummerEngine,
+    internal convenience init(_ parent: SummerEngine,
                             draw: SummerDraw,
                             x: Float, y: Float,
                             width: Float, height: Float,
@@ -501,7 +485,7 @@ open class SummerObject {
     ///   - height: The height of the object.
     ///   - animation: The animation that will be animating this object.
     ///   - isVisible: If false, the object will not be shown by default.
-    public convenience init(_ parent: SummerEngine,
+    internal convenience init(_ parent: SummerEngine,
                             transform: SummerTransform,
                             x: Float, y: Float,
                             width: Float, height: Float,
@@ -528,7 +512,7 @@ open class SummerObject {
     ///   - height: The height of the object.
     ///   - animation: The animation that will be animating this object.
     ///   - isVisible: If false, the object will not be shown by default.
-    public convenience init(_ parent: SummerEngine,
+    internal convenience init(_ parent: SummerEngine,
                             x: Float, y: Float,
                             width: Float, height: Float,
                             animation: SummerAnimation,

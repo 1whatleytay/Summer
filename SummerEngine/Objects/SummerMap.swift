@@ -85,6 +85,30 @@ public class SummerMap {
         return withTransform(transform: parent.makeTransform())
     }
     
+    /// Changes a tile in the map.
+    ///
+    /// - Parameters:
+    ///   - x: The x location of the tile.
+    ///   - y: The y location of the tile.
+    ///   - value: An index to replace the tile.
+    public func editTile(x: Int, y: Int, value: UInt32) {
+        if !final {
+            if x >= 0 && y >= 0 && x < width && y < height {
+                buffer.contents()
+                    .advanced(by: SummerMap.metadataSize + (x + y * width) * MemoryLayout<UInt32>.size)
+                    .copyMemory(from: [value], byteCount: MemoryLayout<UInt32>.size)
+            }
+        }
+    }
+    
+    /// Changes a tile in the map.
+    ///
+    /// - Parameters:
+    ///   - x: The x location of the tile.
+    ///   - y: The y location of the tile.
+    ///   - value: An index to replace the tile.
+    public func editTile(x: Int, y: Int, value: Int) { editTile(x: x, y: y, value: UInt32(value)) }
+    
     internal init(_ parent: SummerEngine,
                   width: Int, height: Int,
                   data: [UInt32],
@@ -128,7 +152,7 @@ public class SummerMap {
         }
         
         if buffer == nil {
-            parent.program.message(message: .couldNotCreateMap)
+            parent.settings.messageHandler?(.couldNotCreateMap)
             return
         }
         

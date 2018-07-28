@@ -17,12 +17,13 @@ struct VertexIn {
 struct VertexOut {
     float4 position [[position]];
     float2 texCoord;
+    float opacity;
 };
 
 struct Transform {
     float2x2 matrix;
-    float2 offset;
-    float2 origin;
+    float2 offset, origin;
+    float opacity, extra;
 };
 
 vertex VertexOut vertexShader(uint vertexId [[vertex_id]],
@@ -38,6 +39,7 @@ vertex VertexOut vertexShader(uint vertexId [[vertex_id]],
                            + t.origin + t.offset
                            , 0, 1);
     vert.texCoord = vertexData[vertexId].texCoord;
+    vert.opacity = t.opacity;
     
     return vert;
 }
@@ -45,7 +47,9 @@ vertex VertexOut vertexShader(uint vertexId [[vertex_id]],
 fragment float4 textureShader(VertexOut vert [[stage_in]],
                               texture2d<float, access::sample> tex [[texture(0)]],
                               sampler sam [[sampler(0)]]) {
-    return tex.sample(sam, vert.texCoord);
+    float4 sample = tex.sample(sam, vert.texCoord);
+    sample.a *= vert.opacity;
+    return sample;
 }
 
 constant VertexOut vertexTypes[] = {
@@ -57,6 +61,7 @@ constant VertexOut vertexTypes[] = {
     { float4(1, 1, 0, 1), float2(1, 1) }
 };
 
+// Replace with struct
 enum MetadataFields {
     mapWidth, mapHeight,
     tilesetWidth, tilesetHeight,
@@ -111,6 +116,8 @@ vertex VertexOut mapVertexShader(uint vertexId [[vertex_id]],
     // Calculate texture location.
     vert.texCoord.x = (vert.texCoord.x + tilesetX) * tileUnitX;
     vert.texCoord.y = (vert.texCoord.y + tilesetY) * tileUnitY;
+    
+    vert.opacity = t.opacity;
     
     return vert;
 }

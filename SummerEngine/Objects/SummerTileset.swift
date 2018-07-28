@@ -14,14 +14,22 @@ public class SummerTileset {
     private let parent: SummerEngine
     
     internal let texture: MTLTexture!
-    internal let tileWidth, tileHeight: Int
     internal let width, height: Int
+    internal let tilesX, tilesY: Int
+    
+    /// The width of a tile in the tileset.
+    public let tileWidth: Int
+    /// The height of a tile in the tileset.
+    public let tileHeight: Int
+    
+    /// The capacity in tiles of the tileset.
+    public let capacity: Int
     
     /// Gathers information about multiple image files.
     ///
     /// - Parameters:
     ///   - files: An array of paths to image files.
-    ///   - location: The location of the image files. .inBundle for relative, .inFolder for global.
+    ///   - location: The location of the image files.
     /// - Returns: A tuple containing information of each file as an array.
     public static func getTilesetData(fromFiles files: [String], _ location: SummerFileLocation)
         -> (tileWidths: [Int], tileHeights: [Int], data: [[Float]])? {
@@ -44,15 +52,53 @@ public class SummerTileset {
             return (tileWidths: tileWidths, tileHeights: tileHeights, data: data)
     }
     
-    internal init(_ parent: SummerEngine, tileWidth: Int, tileHeight: Int, data: [[UInt8]]) {
+    /// Edits a region of a tile.
+    ///
+    /// - Parameters:
+    ///   - tileIndex: The index of the tile.
+    ///   - x: The x coordinate in the tile to be replaced.
+    ///   - y: The y coordinate in the tile to be replaced.
+    ///   - replaceWidth: The width of the replacement.
+    ///   - replaceHeight: The height of the replacement.
+    ///   - data: The data to replace the region.
+    public func editTile(tileIndex: Int, x: Int, y: Int, replaceWidth: Int, replaceHeight: Int, data: [UInt8]) {
+        if tileIndex < 0 || x < 0 || y < 0 || replaceWidth < 0 || replaceHeight < 0 { return }
+        if tileIndex >= capacity || x + replaceWidth > tileWidth || y + replaceHeight > tileHeight { return }
+        
+        let tileX = tileIndex % tilesX
+        let tileY = tileIndex % tilesY
+        
+        texture.replace(region: MTLRegionMake2D(tileX + x, tileY + y, replaceWidth, replaceHeight), mipmapLevel: 0, withBytes: data, bytesPerRow: replaceWidth * 4)
+    }
+    
+    /// Replaces an entire tile.
+    ///
+    /// - Parameters:
+    ///   - tileIndex: The index of the tile.
+    ///   - data: The data to replace the tile.
+    public func setTile(tileIndex: Int, data: [UInt8]) {
+        if tileIndex >= capacity { return }
+        
+        let tileX = tileIndex % tilesX
+        let tileY = tileIndex % tilesY
+        
+        texture.replace(region: MTLRegionMake2D(tileX, tileY, tileWidth, tileHeight),
+                        mipmapLevel: 0, withBytes: data, bytesPerRow: tileWidth * 4)
+    }
+    
+    internal init(_ parent: SummerEngine, tileWidth: Int, tileHeight: Int, data: [[UInt8]], alloc: Int = 0) {
         self.parent = parent
         self.tileWidth = tileWidth
         self.tileHeight = tileHeight
         
-        let dimension = Int(ceil(sqrt(Double(data.count))))
+        let dimension = Int(ceil(sqrt(Double(data.count + alloc))))
         
         width = dimension * tileWidth
         height = dimension * tileHeight
+        
+        self.capacity = dimension * dimension
+        self.tilesX = dimension
+        self.tilesY = dimension
         
         let descriptior =
             MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm,
@@ -62,7 +108,7 @@ public class SummerTileset {
         texture = parent.device.makeTexture(descriptor: descriptior)
         
         if texture == nil {
-            parent.program.message(message: .couldNotCreateTileset)
+            parent.settings.messageHandler?(.couldNotCreateTileset)
             return
         }
         
@@ -81,7 +127,7 @@ public class SummerTileset {
         }
     }
     
-    internal convenience init(_ parent: SummerEngine, tileWidth: Int, tileHeight: Int, data: [[Float]]) {
+    internal convenience init(_ parent: SummerEngine, tileWidth: Int, tileHeight: Int, data: [[Float]], alloc: Int = 0) {
         var subdata = [[UInt8]](repeating: [UInt8](repeating: 0, count: tileWidth * tileHeight * 4), count: data.count)
         
         for i in 0 ..< data.count {
@@ -90,23 +136,27 @@ public class SummerTileset {
             }
         }
         
-        self.init(parent, tileWidth: tileWidth, tileHeight: tileHeight, data: subdata)
+        self.init(parent, tileWidth: tileWidth, tileHeight: tileHeight, data: subdata, alloc: alloc)
     }
     
-    internal convenience init?(_ parent: SummerEngine, fromFiles files: [String], _ location: SummerFileLocation) {
+    internal convenience init?(_ parent: SummerEngine,
+                               fromFiles files: [String],
+                               _ location: SummerFileLocation,
+                               alloc: Int = 0) {
         guard let tilesetData = SummerTileset.getTilesetData(fromFiles: files, location)
             else {
-                parent.program.message(message: .couldNotLoadTileset)
+                parent.settings.messageHandler?(.couldNotLoadTileset)
                 return nil
         }
         
         self.init(parent,
                   tileWidth: tilesetData.tileWidths[0],
                   tileHeight: tilesetData.tileHeights[0],
-                  data: tilesetData.data)
+                  data: tilesetData.data,
+                  alloc: alloc)
     }
     
-    internal convenience init?(_ parent: SummerEngine, fromFiles files: [String]) {
-        self.init(parent, fromFiles: files, parent.settings.defaultTextureLocation)
+    internal convenience init?(_ parent: SummerEngine, fromFiles files: [String], alloc: Int = 0) {
+        self.init(parent, fromFiles: files, parent.settings.defaultTextureLocation, alloc: alloc)
     }
 }

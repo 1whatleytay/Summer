@@ -18,6 +18,8 @@ class SummerAnimTest: SummerProgram {
     func setup(engine: SummerEngine) {
         self.engine = engine
         
+        engine.settings.messageHandler = { message in print(message) }
+        
         animation = engine.makeAnimation(
             fromFiles: ["myguy1.png", "myguy2.png", "myguy1.png", "myguy3.png"],
             animationRate: 0.5)
@@ -27,10 +29,6 @@ class SummerAnimTest: SummerProgram {
     }
     
     func update() {
-        
-    }
-    
-    func message(message: SummerMessage) {
         
     }
     

@@ -10,8 +10,6 @@ public protocol SummerProgram {
     func setup(engine: SummerEngine)
     func update()
     
-    func message(message: SummerMessage)
-    
     func key(key: SummerKey, characters: String?, state: SummerInputState)
     func mouse(button: SummerMouseButton, x: Double, y: Double, state: SummerInputState)
 }
