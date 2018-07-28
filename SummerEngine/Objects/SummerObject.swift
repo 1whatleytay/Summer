@@ -174,7 +174,7 @@ open class SummerObject {
     ///
     /// - Parameter newTransform: The transform that will be used.
     /// - Returns: Self.
-    public func withTransform(transform newTransform: SummerTransform) -> SummerObject {
+    public func withTransform(_ newTransform: SummerTransform) -> SummerObject {
         setTransform(to: newTransform)
         
         return self
@@ -184,7 +184,7 @@ open class SummerObject {
     ///
     /// - Returns: Self.
     public func withTransform() -> SummerObject {
-        return withTransform(transform: parent.makeTransform())
+        return withTransform(parent.makeTransform())
     }
     
     /// Replaces this objects texture with a different texture.

@@ -61,51 +61,41 @@ constant VertexOut vertexTypes[] = {
     { float4(1, 1, 0, 1), float2(1, 1) }
 };
 
-// Replace with struct
-enum MetadataFields {
-    mapWidth, mapHeight,
-    tilesetWidth, tilesetHeight,
-    tileWidth, tileHeight,
-    tilesX, tilesY,
-    bigUnitX, bigUnitY
+struct MapMetadata {
+    uint mapWidth, mapHeight;
+    uint tilesetWidth, tilesetHeight;
+    uint tileWidth, tileHeight;
+    uint tilesX, tilesY;
+    float unitX, unitY;
 };
 
 vertex VertexOut mapVertexShader(uint vertexId [[vertex_id]],
-                                 constant uint* metadata [[buffer(0)]],
+                                 constant MapMetadata* metadata [[buffer(0)]],
                                  constant uint* mapData [[buffer(1)]],
-                                 constant Transform* transform [[buffer(2)]]) {
+                                 constant Transform* transforms [[buffer(2)]],
+                                 constant uint* transformId [[buffer(3)]]) {
     // Get map metadata.
-    uint mapWidth = metadata[MetadataFields::mapWidth];
-    uint tilesetWidth = metadata[MetadataFields::tilesetWidth], tilesetHeight = metadata[MetadataFields::tilesetHeight];
-    uint tileWidth = metadata[MetadataFields::tileWidth], tileHeight = metadata[MetadataFields::tileHeight];
-    uint tilesX = metadata[MetadataFields::tilesX];
-    uint bigUnitX = metadata[MetadataFields::bigUnitX], bigUnitY = metadata[MetadataFields::bigUnitY];
+    MapMetadata meta = *metadata;
     
     // Get transform.
-    Transform t = *transform;
+    Transform t = transforms[*transformId];
     
     // Calculate locations and vertex locations.
     uint vertexType = vertexId % 6;
     uint tileId = vertexId / 6;
     uint tileData = mapData[tileId];
-    uint tileX = tileId % mapWidth, tileY = tileId / mapWidth;
-    uint tilesetX = tileData % tilesX, tilesetY = tileData / tilesX;
+    uint tileX = tileId % meta.mapWidth, tileY = tileId / meta.mapWidth;
+    uint tilesetX = tileData % meta.tilesX, tilesetY = tileData / meta.tilesX;
     
-    float tileUnitX = tileWidth / (float)tilesetWidth;
-    float tileUnitY = tileHeight / (float)tilesetHeight;
+    float tileUnitX = meta.tileWidth / (float)meta.tilesetWidth;
+    float tileUnitY = meta.tileHeight / (float)meta.tilesetHeight;
     
     // Get a vertex location from the `vertexTypes` array.
     VertexOut vert = vertexTypes[vertexType];
     
     // Adjust the tile location.
-    vert.position.x += tileX;
-    vert.position.y += tileY;
-    
-//    vert.position.x *= tileWidth;
-//    vert.position.y *= tileHeight;
-    
-    vert.position.x = vert.position.x / bigUnitX * 2 - 1;
-    vert.position.y = -(vert.position.y / bigUnitY * 2 - 1);
+    vert.position.x = (vert.position.x + tileX) * meta.unitX * 2 - 1;
+    vert.position.y = -((vert.position.y + tileY) * meta.unitY * 2 - 1);
     
     // Apply transform.
     float2 newPos = t.matrix * (vert.position.xy - t.origin) + t.origin + t.offset;

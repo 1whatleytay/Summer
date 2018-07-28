@@ -12,8 +12,6 @@ import simd
 
 /// An object that contains information on different transformations.
 public class SummerTransform {
-    public static var value = 40
-    
     internal static let size = 40
     internal static let pivotSize = 4
     
@@ -117,7 +115,7 @@ public class SummerTransform {
     }
     
     internal func setMapTransform(_ renderEncoder: MTLRenderCommandEncoder) {
-        renderEncoder.setVertexBuffer(parent.transformBuffer, offset: SummerTransform.value, index: 2)
+        renderEncoder.setVertexBytes([UInt32(transformId)], length: 4, index: 3)
     }
     
     /// Multiples a custom matrix to the current matrix.

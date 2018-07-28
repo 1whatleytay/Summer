@@ -64,24 +64,37 @@ class Particle: SummerObject {
 class SummerParticles: SummerProgram {
     var engine: SummerEngine!
     
+    var red, circle: SummerTexture!
+    
     func setup(engine: SummerEngine) {
         self.engine = engine
         
+        circle = engine.makeTexture(fromFile: "circle.png")
+        red = engine.makeColor(red: 1, green: 0, blue: 0, alpha: 1)
+        
         Particle.parent = engine
-        Particle.color = engine.makeTexture(fromFile: "circle.png")
-        //Particle.color = engine.makeColor(red: 1, green: 0, blue: 0, alpha: 1)
+        Particle.color = red
         
         Particle.spawnX = Float(Particle.parent.settings.displayWidth / 2)
         Particle.spawnY = Float(Particle.parent.settings.displayHeight / 2)
         
-        engine.beforeUpdateEvents.append { Particle.step() }
+        //engine.beforeUpdateEvents.append { Particle.step() }
     }
     
     func update() {
+        Particle.step()
         _ = Particle()
     }
     
-    func key(key: SummerKey, characters: String?, state: SummerInputState) { }
+    func key(key: SummerKey, characters: String?, state: SummerInputState) {
+        if state == .pressed && key == .vkL {
+            if Particle.color === red {
+                Particle.color = circle
+            } else {
+                Particle.color = red
+            }
+        }
+    }
     
     func mouse(button: SummerMouseButton, x: Double, y: Double, state: SummerInputState) {
         if state == .movement {

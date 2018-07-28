@@ -27,6 +27,7 @@ public class SummerMap {
     internal func setResources(_ renderEncoder: MTLRenderCommandEncoder) {
         renderEncoder.setVertexBuffer(buffer, offset: 0, index: 0)
         renderEncoder.setVertexBuffer(buffer, offset: SummerMap.metadataSize, index: 1)
+        renderEncoder.setVertexBuffer(parent.transformBuffer, offset: 0, index: 2)
         renderEncoder.setFragmentTexture(tileset.texture, index: 0)
         transform.setMapTransform(renderEncoder)
     }
@@ -72,8 +73,8 @@ public class SummerMap {
     ///
     /// - Parameter newTransform: The new transform to be set.
     /// - Returns: Self.
-    public func withTransform(transform newTransform: SummerTransform) -> SummerMap {
-        transform = newTransform
+    public func withTransform(_ transform: SummerTransform) -> SummerMap {
+        self.transform = transform
         
         return self
     }
@@ -82,7 +83,7 @@ public class SummerMap {
     ///
     /// - Returns: Self.
     public func withTransform() -> SummerMap {
-        return withTransform(transform: parent.makeTransform())
+        return withTransform(parent.makeTransform())
     }
     
     /// Changes a tile in the map.
@@ -128,9 +129,8 @@ public class SummerMap {
             UInt32(tileset.width), UInt32(tileset.height),
             UInt32(tileset.tileWidth), UInt32(tileset.tileHeight),
             UInt32(tileset.width / tileset.tileWidth), UInt32(tileset.height / tileset.tileHeight),
-            UInt32(unitX), UInt32(unitY)
+            unitX.bitPattern, unitY.bitPattern
         ]
-        
         metadata.append(contentsOf: data)
         
         let bufferSize = SummerMap.metadataSize + width * height * 4

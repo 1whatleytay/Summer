@@ -34,30 +34,21 @@ class SummerMapTest: SummerProgram {
         map = engine.makeMap(width: 4, height: 4,
                              data: mapData,
                              tileset: tileset,
-                             unitX: 10, unitY: 10)
+                             unitX: 50/600, unitY: 50/600).withTransform()
         
-        myObject = engine.makeObject(x: 0, y: 0, width: 50, height: 50, texture: engine.makeTexture(fromFile: "fourty.png")!).withTransform()
+        myObject = engine.makeObject(x: 0, y: 0, width: 50, height: 50, texture: engine.makeTexture(fromFile: "fourty.png")!).withTransform(map.transform)
     }
     
     func update() { }
     
-    func key(key: SummerKey, characters: String?, state: SummerInputState) {
-        if state == .pressed {
-            if key == .vkUp {
-                SummerTransform.value += 1
-                print(SummerTransform.value)
-            } else if key == .vkDown {
-                SummerTransform.value -= 1
-                print(SummerTransform.value)
-            }
-        }
-    }
+    func key(key: SummerKey, characters: String?, state: SummerInputState) { }
     
     func mouse(button: SummerMouseButton, x: Double, y: Double, state: SummerInputState) {
         if state == .movement {
-            myObject.put(x: Float(x), y: Float(y))
+            map.transform.setOffset(x: Float(x), y: Float(y))
+            map.transform.setOrigin(x: Float(x), y: Float(y))
             map.transform.setIdentity()
-            map.transform.rotate(degree: Float(x / 2))
+            map.transform.rotate(degree: Float(x / 10))
         }
     }
     

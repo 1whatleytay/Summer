@@ -173,8 +173,8 @@ extension SummerEngine {
     ///   - data: An array of indices into the tileset. Each value is one tile in the map.
     ///   - tileset: A tileset containing images for each tile in the map.
     ///   - transform: A transform for moving the map.
-    ///   - unitX: A number representing how many tiles can fit on the screen horizontally.
-    ///   - unitY: A number representing how many tiles can fit on the screen vertically.
+    ///   - unitX: A fraction representing how much of the screen one tile should take horizontally.
+    ///   - unitY: A fraction representing how much of the screen one tile should take vertically.
     ///   - final: If true, the map will be constant.
     /// - Returns: A map object.
     public func makeMap(width: Int, height: Int,
@@ -218,8 +218,8 @@ extension SummerEngine {
     ///   - height: The height of the map in tiles.
     ///   - data: An array of indices into the tileset. Each value is one tile in the map.
     ///   - tileset: A tileset containing images for each tile in the map.
-    ///   - unitX: A number representing how many tiles can fit on the screen horizontally.
-    ///   - unitY: A number representing how many tiles can fit on the screen vertically.
+    ///   - unitX: A fraction representing how much of the screen one tile should take horizontally.
+    ///   - unitY: A fraction representing how much of the screen one tile should take vertically.
     ///   - final: If true, the map will be constant.
     /// - Returns: A map object.
     public func makeMap(width: Int, height: Int,
@@ -261,8 +261,8 @@ extension SummerEngine {
     ///   - data: An array of indices into the tileset. Each value is one tile in the map.
     ///   - tileset: A tileset containing images for each tile in the map.
     ///   - transform: A transform for moving the map.
-    ///   - unitX: A number representing how many tiles can fit on the screen horizontally.
-    ///   - unitY: A number representing how many tiles can fit on the screen vertically.
+    ///   - unitX: A fraction representing how much of the screen one tile should take horizontally.
+    ///   - unitY: A fraction representing how much of the screen one tile should take vertically.
     ///   - final: If true, the map will be constant.
     /// - Returns: A map object.
     public func makeMap(width: Int, height: Int,
@@ -307,8 +307,8 @@ extension SummerEngine {
     ///   - height: The height of the map in tiles.
     ///   - data: An array of indices into the tileset. Each value is one tile in the map.
     ///   - tileset: A tileset containing images for each tile in the map.
-    ///   - unitX: A number representing how many tiles can fit on the screen horizontally.
-    ///   - unitY: A number representing how many tiles can fit on the screen vertically.
+    ///   - unitX: A fraction representing how much of the screen one tile should take horizontally.
+    ///   - unitY: A fraction representing how much of the screen one tile should take vertically.
     ///   - final: If true, the map will be constant.
     /// - Returns: A map object.
     public func makeMap(width: Int, height: Int,
