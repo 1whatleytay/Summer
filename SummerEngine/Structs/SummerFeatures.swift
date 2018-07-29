@@ -32,6 +32,9 @@ public struct SummerFeatures {
     /// If true, SummerEngine will reset its settings each time a program is changed.
     public var clearSettingsOnProgramSwap = false
     
+    /// If true, the default metal library will be used.
+    public var useDefaultLibrary = false
+    
     /// Constructor.
     public init() { }
 }

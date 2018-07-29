@@ -23,9 +23,7 @@ class SummerAnimTest: SummerProgram {
         animation = engine.makeAnimation(
             fromFiles: ["myguy1.png", "myguy2.png", "myguy1.png", "myguy3.png"],
             animationRate: 0.5)
-        obj = engine.makeObject(x: 0, y: 0, width: 300, height: 300, texture: engine.makeNilTexture())
-        
-        obj.setAnimation(animation: animation)
+        obj = engine.makeObject(x: 0, y: 0, width: 300, height: 300, animation: animation)
     }
     
     func update() {

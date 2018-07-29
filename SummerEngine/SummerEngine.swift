@@ -32,21 +32,22 @@ import MetalKit
     - Animation Groups (Part of the main texture)
     - Documentation
     - Modify Textures
+    - Opacity Transforms
  
  Cool Features:
     - Single File Tileset Loading (GIF and Tileset Image)
     - Combined Transforms
-    - Buttons and Events
+    - Buttons and Better Events
     - Batch Tileset/Animation loading
-    - Opacity Transforms?
     - Make Object Constructors Dedicated (so overriding works well)
  
  Just in case I forget:
-    - Allow passing an animation instead of a texture SummerObject.
-    - Clear Object/Transform space on delete in SummerFeatures
+    - Set Object/Transform space to 0 on delete in SummerFeatures
+    - Merge unit and display detection functions (should be same unit)
  
  Fixes:
     - Mouse flipping should not be using Units (exclusively, mostly Amps) and should be applied to x and y
+    - Brief nil texture animation bug on start
  */
 
 /// Stores instance resources and hosts methods for creating objects.
@@ -156,6 +157,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
                 renderEncoder.setFragmentSamplerState(samplerState, index: 0)
                 if maps.count > 0 {
                     renderEncoder.setRenderPipelineState(mapPipelineState)
+                    renderEncoder.setVertexBuffer(transformBuffer, offset: 0, index: 2)
                     for map in maps {
                         map.setResources(renderEncoder)
                         map.addDraws(renderEncoder)
@@ -240,12 +242,12 @@ public class SummerEngine : NSObject, MTKViewDelegate {
             object.texture.allocate()
             // Kou-chan will remember this.
             if object.transform.isGlobal {
-                object.setTransform(to: globalTransform)
+                object.transform = globalTransform
             } else {
                 object.transform.allocate()
             }
             if object.draw.isGlobal {
-                globalDraw.addObject(object: object)
+                globalDraw.addObject(object)
             } else {
                 draws.append(object.draw)
             }
@@ -372,16 +374,28 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
         let mapPipelineDescriptor = MTLRenderPipelineDescriptor()
-        if let library = device.makeDefaultLibrary() {
-            let vertexShader = library.makeFunction(name: "vertexShader")
-            let mapVertexShader = library.makeFunction(name: "mapVertexShader")
-            let textureShader = library.makeFunction(name: "textureShader")
-            
-            pipelineDescriptor.vertexFunction = vertexShader
-            pipelineDescriptor.fragmentFunction = textureShader
-            mapPipelineDescriptor.vertexFunction = mapVertexShader
-            mapPipelineDescriptor.fragmentFunction = textureShader
-        } else { throw SummerError.noDefaultLibrary }
+        
+        var library: MTLLibrary
+        
+        if features.useDefaultLibrary {
+            if let lib = device.makeDefaultLibrary() { library = lib }
+            else { throw SummerError.couldNotFindLibrary }
+        } else {
+            guard let libraryPath = Bundle.main.path(forResource: "SummerShaders", ofType: "metallib")
+                else { throw SummerError.couldNotFindLibrary }
+            if let lib = try? device.makeLibrary(filepath: libraryPath) { library = lib }
+            else { throw SummerError.couldNotFindLibrary }
+        }
+        
+        let vertexShader = library.makeFunction(name: "vertexShader")
+        let mapVertexShader = library.makeFunction(name: "mapVertexShader")
+        let textureShader = library.makeFunction(name: "textureShader")
+        
+        pipelineDescriptor.vertexFunction = vertexShader
+        pipelineDescriptor.fragmentFunction = textureShader
+        mapPipelineDescriptor.vertexFunction = mapVertexShader
+        mapPipelineDescriptor.fragmentFunction = textureShader
+        
         pipelineDescriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat
         mapPipelineDescriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat
         if features.transparency {

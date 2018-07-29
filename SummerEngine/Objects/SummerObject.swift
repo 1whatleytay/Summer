@@ -27,18 +27,54 @@ open class SummerObject {
     
     /// The texture for the object.
     public var texture: SummerTexture
-    /// The animation that is currently animating this object.
-    public internal(set) var animation: SummerAnimation?
     
+    internal var _animation: SummerAnimation?
+    /// The animation that is currently animating this object.
+    public var animation: SummerAnimation? {
+        get { return _animation }
+        set {
+            if let anim = newValue {
+                anim.addObject(self)
+            } else {
+                _animation = nil
+            }
+        }
+    }
+    
+    private var _isVisible: Bool
     /// If true, the object will be drawn to the screen. Use show() and hide() to manipulate this value.
-    public private(set) var isVisible: Bool
+    public var isVisible: Bool {
+        get { return _isVisible }
+        set {
+            if newValue { show() }
+            else { hide() }
+        }
+    }
     /// If true, this object will be deleted when the engine is low on memory.
     public private(set) var isDisposable = false
     
+    private var _draw: SummerDraw
     /// The draw this object belongs to.
-    public private(set) var draw: SummerDraw
+    public var draw: SummerDraw {
+        get { return _draw }
+        set {
+            _draw.removeIndex(index: objectId)
+            
+            newValue.addIndex(index: objectId)
+            _draw = newValue
+        }
+    }
+    
+    private var _transform: SummerTransform
     /// The transform that contains transformation data for this object.
-    public private(set) var transform: SummerTransform
+    public var transform: SummerTransform {
+        get { return _transform }
+        set {
+            newValue.pivot(objectId: objectId)
+            
+            _transform = newValue
+        }
+    }
     
     internal static func allocate(_ parent: SummerEngine) -> Int {
         var indexFind = -1
@@ -53,6 +89,7 @@ open class SummerObject {
     }
     
     internal func allocate() {
+        if objectId == -1 { return }
         if parent.settings.debugPrintAllocationMessages {
             print("Allocate Object: \(objectId)")
         }
@@ -97,11 +134,6 @@ open class SummerObject {
         }
     }
     
-    /// Starts animating this object with an animation.
-    ///
-    /// - Parameter animation: The animaiton to be used.
-    public func setAnimation(animation: SummerAnimation) { animation.addObject(self) }
-    
     /// Removes any animation this object has been using.
     public func removeAnimation() {  animation?.removeObject(self) }
     
@@ -122,22 +154,12 @@ open class SummerObject {
         return self
     }
     
-    /// Sets this object's parent draw.
-    ///
-    /// - Parameter newDraw: The draw that will be used.
-    public func setDraw(to newDraw: SummerDraw) {
-        draw.removeIndex(index: objectId)
-        
-        newDraw.addIndex(index: objectId)
-        draw = newDraw
-    }
-    
     /// Makes a draw. This draw will become this object's parent draw.
     ///
     /// - Returns: A draw object.
     @discardableResult public func makeDraw() -> SummerDraw {
         let newDraw = SummerDraw(parent)
-        setDraw(to: newDraw)
+        draw = newDraw
         
         return newDraw
     }
@@ -151,21 +173,12 @@ open class SummerObject {
         return self
     }
     
-    /// Sets this object's transform.
-    ///
-    /// - Parameter newTransform: The transform that will be used.
-    public func setTransform(to newTransform: SummerTransform) {
-        newTransform.pivot(objectId: objectId)
-        
-        transform = newTransform
-    }
-    
     /// Makes a transform. This transform will become this object's transform.
     ///
     /// - Returns: A transform object.
     @discardableResult public func makeTransform() -> SummerTransform {
-        let newTransform = SummerTransform(parent)
-        setTransform(to: newTransform)
+        let newTransform = parent.makeTransform()
+        transform = newTransform
         
         return newTransform
     }
@@ -175,7 +188,7 @@ open class SummerObject {
     /// - Parameter newTransform: The transform that will be used.
     /// - Returns: Self.
     public func withTransform(_ newTransform: SummerTransform) -> SummerObject {
-        setTransform(to: newTransform)
+        transform = newTransform
         
         return self
     }
@@ -230,30 +243,19 @@ open class SummerObject {
     
     /// Hides the object. The object will no longer be visible.
     public func hide() {
-        if isVisible {
-            draw.removeIndex(index: objectId)
-            isVisible = false
+        if _isVisible {
+            _draw.removeIndex(index: objectId)
+            _isVisible = false
         }
     }
     
     /// Shows the object. The object will now be visible.
     public func show() {
-        if !isVisible {
-            draw.addIndex(index: objectId)
-            isVisible = true
+        if !_isVisible {
+            _draw.addIndex(index: objectId)
+            _isVisible = true
         }
     }
-    
-    /// Sets the objects visibility.
-    ///
-    /// - Parameter value: If false, the object will be hidden. Otherwise, the object will be visible.
-    public func setVisible(value: Bool) {
-        if value { show() }
-        else { hide() }
-    }
-    
-    /// Toggles object visibility.
-    public func toggleVisible() { setVisible(value: !isVisible) }
     
     /// Creates a new identical object.
     ///
@@ -265,14 +267,14 @@ open class SummerObject {
                             x: x, y: y,
                             width: width, height: height,
                             texture: texture,
-                            isVisible: isVisible)
+                            isVisible: _isVisible)
     }
     
     /// Frees all resources used by this object.
     open func delete() {
         if objectId == -1 { return }
         
-        draw.removeIndex(index: objectId)
+        _draw.removeIndex(index: objectId)
         parent.objectAllocationData[objectId] = false
     }
     
@@ -318,11 +320,11 @@ open class SummerObject {
         
         self.texture = texture
         
-        self.draw = draw
-        self.isVisible = isVisible
+        self._draw = draw
+        self._isVisible = isVisible
         if isVisible { draw.addIndex(index: objectId) }
         
-        self.transform = parent.globalTransform
+        self._transform = parent.globalTransform
         transform.pivot(objectId: objectId)
         
         save()
@@ -441,7 +443,7 @@ open class SummerObject {
                   texture: parent.makeNilTexture(),
                   isVisible: isVisible)
         
-        setAnimation(animation: animation)
+        self.animation = animation
     }
     
     /// Constructor.

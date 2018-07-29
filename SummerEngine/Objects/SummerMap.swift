@@ -17,17 +17,41 @@ public class SummerMap {
     
     private let buffer: MTLBuffer!
     private let width, height: Int
+    private let unitX, unitY: Float
     private let final : Bool
     
+    private var _tileset: SummerTileset
     /// The used tileset.
-    public private(set) var tileset: SummerTileset
+    public var tileset: SummerTileset {
+        get { return _tileset }
+        set {
+            if !final {
+                _tileset = newValue
+                
+                remakeMetadata()
+            }
+        }
+    }
     /// The used transform.
     public var transform: SummerTransform
+    
+    private func remakeMetadata() {
+        if final { return }
+        
+        let metadata = [
+            UInt32(width), UInt32(height),
+            UInt32(_tileset.width), UInt32(_tileset.height),
+            UInt32(_tileset.tileWidth), UInt32(_tileset.tileHeight),
+            UInt32(_tileset.width / _tileset.tileWidth), UInt32(_tileset.height / _tileset.tileHeight),
+            unitX.bitPattern, unitY.bitPattern
+        ]
+        
+        buffer.contents().copyMemory(from: metadata, byteCount: 4 * 10)
+    }
     
     internal func setResources(_ renderEncoder: MTLRenderCommandEncoder) {
         renderEncoder.setVertexBuffer(buffer, offset: 0, index: 0)
         renderEncoder.setVertexBuffer(buffer, offset: SummerMap.metadataSize, index: 1)
-        renderEncoder.setVertexBuffer(parent.transformBuffer, offset: 0, index: 2)
         renderEncoder.setFragmentTexture(tileset.texture, index: 0)
         transform.setMapTransform(renderEncoder)
     }
@@ -120,11 +144,13 @@ public class SummerMap {
         self.parent = parent
         self.width = width
         self.height = height
-        self.tileset = tileset
+        self._tileset = tileset
         self.transform = transform
+        self.unitX = unitX
+        self.unitY = unitY
         self.final = final
         
-        var metadata: [UInt32] = [
+        var metadata = [
             UInt32(width), UInt32(height),
             UInt32(tileset.width), UInt32(tileset.height),
             UInt32(tileset.tileWidth), UInt32(tileset.tileHeight),
@@ -170,8 +196,8 @@ public class SummerMap {
                   data: data,
                   tileset: tileset,
                   transform: transform,
-                  unitX: 1 / parent.settings.horizontalUnit,
-                  unitY: 1 / parent.settings.verticalUnit,
+                  unitX: parent.settings.horizontalUnit,
+                  unitY: parent.settings.verticalUnit,
                   final: final)
     }
     
@@ -200,8 +226,8 @@ public class SummerMap {
                   data: data,
                   tileset: tileset,
                   transform: parent.globalTransform,
-                  unitX: 1 / parent.settings.horizontalUnit,
-                  unitY: 1 / parent.settings.verticalUnit,
+                  unitX: parent.settings.horizontalUnit,
+                  unitY: parent.settings.verticalUnit,
                   final: final)
     }
     
@@ -236,8 +262,8 @@ public class SummerMap {
                   data: data,
                   tileset: tileset,
                   transform: transform,
-                  unitX: 1 / parent.settings.horizontalUnit,
-                  unitY: 1 / parent.settings.verticalUnit,
+                  unitX: parent.settings.horizontalUnit,
+                  unitY: parent.settings.verticalUnit,
                   final: final)
     }
     
@@ -266,8 +292,8 @@ public class SummerMap {
                   data: data,
                   tileset: tileset,
                   transform: parent.globalTransform,
-                  unitX: 1 / parent.settings.horizontalUnit,
-                  unitY: 1 / parent.settings.verticalUnit,
+                  unitX: parent.settings.horizontalUnit,
+                  unitY: parent.settings.verticalUnit,
                   final: final)
     }
 }

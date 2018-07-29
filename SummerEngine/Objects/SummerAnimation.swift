@@ -40,9 +40,9 @@ public class SummerAnimation: NSObject {
     ///
     /// - Parameter object: The object to be animated.
     public func addObject(_ object: SummerObject) {
-        if object.animation === self { return }
-        object.animation?.removeObject(object)
-        object.animation = self
+        if object._animation === self { return }
+        object._animation?.removeObject(object)
+        object._animation = self
         objects.append(object)
     }
     
@@ -53,7 +53,7 @@ public class SummerAnimation: NSObject {
         for i in 0 ..< objects.count {
             if objects[i] === object {
                 objects.remove(at: i)
-                object.animation = nil
+                object._animation = nil
             }
         }
     }

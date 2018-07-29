@@ -58,6 +58,7 @@ public class SummerTransform {
     }
     
     internal func allocate() {
+        if transformId == -1 { return }
         if parent.settings.debugPrintAllocationMessages {
             print("Allocated transform: \(transformId)")
         }

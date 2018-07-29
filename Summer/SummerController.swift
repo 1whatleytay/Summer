@@ -18,7 +18,7 @@ class SummerController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        engine = try? SummerEngine(SummerMapTest(), view: summerView)
+        engine = try? SummerEngine(SummerParticles(), view: summerView)
         
         if engine == nil { print("Failed to start SummerEngine.") }
     }

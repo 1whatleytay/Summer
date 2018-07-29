@@ -127,7 +127,7 @@ public class SummerDraw {
     /// Adds an object to the draw.
     ///
     /// - Parameter object: The object to add.
-    public func addObject(object: SummerObject) { object.setDraw(to: self) }
+    public func addObject(_ object: SummerObject) { object.draw = self }
     
     /// Makes an object. The object will be part of this draw.
     ///

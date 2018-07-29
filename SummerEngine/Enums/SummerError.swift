@@ -12,11 +12,11 @@ import Foundation
 ///
 /// - cannotCreateDevice: Could not create a metal device on this platform.
 /// - cannotCreateResources: Could not create metal resources.
-/// - noDefaultLibrary: Could not find a default library.
+/// - couldNotFindLibrary: Could not find a shader library.
 /// - viewInUse: The view object is already in use by another SummerEngine.
 public enum SummerError: Error {
     case cannotCreateDevice
     case cannotCreateResources
-    case noDefaultLibrary
+    case couldNotFindLibrary
     case viewInUse
 }

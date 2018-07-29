@@ -46,7 +46,7 @@ class SummerGame: SummerProgram {
             case .vkReturn:
                 engine.swapPrograms(SummerMenu(red), keepObjects: [red])
             case .vkL:
-                green.toggleVisible()
+                green.isVisible = !green.isVisible
             default:
                 break
             }

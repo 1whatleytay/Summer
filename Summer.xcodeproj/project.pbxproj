@@ -27,12 +27,13 @@
 		B80C2E3120F5991E007E8647 /* SummerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = B80C2E3020F5991E007E8647 /* SummerInput.swift */; };
 		B824C8C0210BB8F000562919 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = B824C8BF210BB8F000562919 /* Queue.swift */; };
 		B824C8C2210BC4EB00562919 /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = B824C8C1210BC4EA00562919 /* circle.png */; };
+		B824C8C8210C26CE00562919 /* SummerShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = B824C8C7210C26CE00562919 /* SummerShaders.metal */; };
+		B824C8CF210C2DBA00562919 /* SummerShaders.metallib in Resources */ = {isa = PBXBuildFile; fileRef = B824C8C5210C26CE00562919 /* SummerShaders.metallib */; };
 		B826A0B520F2F5CE00ABED4A /* SummerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D25B0520E52D1F005EFF90 /* SummerError.swift */; };
 		B845A89520E09F6C000904D3 /* SummerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B845A89420E09F6C000904D3 /* SummerView.swift */; };
 		B84DEE7620F7E3AD00D397A8 /* SummerMapTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84DEE7520F7E3AD00D397A8 /* SummerMapTest.swift */; };
 		B87612A12104FFC600235E8E /* SummerParticles.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87612A02104FFC600235E8E /* SummerParticles.swift */; };
 		B8B02E1320F1481000951616 /* SummerTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B02E1220F1481000951616 /* SummerTransform.swift */; };
-		B8C57E5C20F6C6DC007F06DC /* SummerShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = B8098F3120E28045008A180B /* SummerShaders.metal */; };
 		B8C57E5E20F6E876007F06DC /* SummerTileset.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C57E5D20F6E876007F06DC /* SummerTileset.swift */; };
 		B8C57E6020F70364007F06DC /* SummerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C57E5F20F70364007F06DC /* SummerData.swift */; };
 		B8C57E6220F79162007F06DC /* SummerMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C57E6120F79162007F06DC /* SummerMap.swift */; };
@@ -48,6 +49,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B824C8CC210C2CC400562919 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B8E9C4F420E01CC800BA74A9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B824C8C4210C26CE00562919;
+			remoteInfo = SummerShaders;
+		};
 		B8E9C52420E0200900BA74A9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B8E9C4F420E01CC800BA74A9 /* Project object */;
@@ -83,7 +91,6 @@
 		B808E98D20FEAF2A004A9A34 /* myguy1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = myguy1.png; sourceTree = "<group>"; };
 		B808E98E20FEAF2A004A9A34 /* myguy2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = myguy2.png; sourceTree = "<group>"; };
 		B8098F3020E28045008A180B /* SummerGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SummerGame.swift; sourceTree = "<group>"; };
-		B8098F3120E28045008A180B /* SummerShaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = SummerShaders.metal; sourceTree = "<group>"; };
 		B8098F3220E28045008A180B /* SummerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SummerController.swift; sourceTree = "<group>"; };
 		B8098F3620E2805A008A180B /* SummerObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SummerObject.swift; sourceTree = "<group>"; };
 		B8098F3720E2805A008A180B /* SummerEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SummerEngine.swift; sourceTree = "<group>"; };
@@ -93,6 +100,8 @@
 		B80C2E3020F5991E007E8647 /* SummerInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerInput.swift; sourceTree = "<group>"; };
 		B824C8BF210BB8F000562919 /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
 		B824C8C1210BC4EA00562919 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
+		B824C8C5210C26CE00562919 /* SummerShaders.metallib */ = {isa = PBXFileReference; explicitFileType = "archive.metal-library"; includeInIndex = 0; path = SummerShaders.metallib; sourceTree = BUILT_PRODUCTS_DIR; };
+		B824C8C7210C26CE00562919 /* SummerShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = SummerShaders.metal; sourceTree = "<group>"; };
 		B845A89420E09F6C000904D3 /* SummerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerView.swift; sourceTree = "<group>"; };
 		B84DEE7520F7E3AD00D397A8 /* SummerMapTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerMapTest.swift; sourceTree = "<group>"; };
 		B87612A02104FFC600235E8E /* SummerParticles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerParticles.swift; sourceTree = "<group>"; };
@@ -204,11 +213,20 @@
 			path = Interfaces;
 			sourceTree = "<group>";
 		};
+		B824C8C6210C26CE00562919 /* SummerShaders */ = {
+			isa = PBXGroup;
+			children = (
+				B824C8C7210C26CE00562919 /* SummerShaders.metal */,
+			);
+			path = SummerShaders;
+			sourceTree = "<group>";
+		};
 		B8E9C4F320E01CC800BA74A9 = {
 			isa = PBXGroup;
 			children = (
 				B8E9C4FE20E01CC800BA74A9 /* Summer */,
 				B8E9C52020E0200900BA74A9 /* SummerEngine */,
+				B824C8C6210C26CE00562919 /* SummerShaders */,
 				B8E9C4FD20E01CC800BA74A9 /* Products */,
 				B8E9C51520E01D0B00BA74A9 /* Frameworks */,
 			);
@@ -219,6 +237,7 @@
 			children = (
 				B8E9C4FC20E01CC800BA74A9 /* Summer.app */,
 				B8E9C51F20E0200900BA74A9 /* SummerEngine.framework */,
+				B824C8C5210C26CE00562919 /* SummerShaders.metallib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -232,7 +251,6 @@
 				B8FC4E7320FA876100F807C1 /* SummerAnimTest.swift */,
 				B87612A02104FFC600235E8E /* SummerParticles.swift */,
 				B8098F3220E28045008A180B /* SummerController.swift */,
-				B8098F3120E28045008A180B /* SummerShaders.metal */,
 				B8E9C4FF20E01CC900BA74A9 /* AppDelegate.swift */,
 				B8E9C50320E01CCA00BA74A9 /* Assets.xcassets */,
 				B8E9C50520E01CCA00BA74A9 /* Main.storyboard */,
@@ -280,6 +298,21 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		B824C8C4210C26CE00562919 /* SummerShaders */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B824C8C9210C26CE00562919 /* Build configuration list for PBXNativeTarget "SummerShaders" */;
+			buildPhases = (
+				B824C8C3210C26CE00562919 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SummerShaders;
+			productName = SummerShaders;
+			productReference = B824C8C5210C26CE00562919 /* SummerShaders.metallib */;
+			productType = "com.apple.product-type.metal-library";
+		};
 		B8E9C4FB20E01CC800BA74A9 /* Summer */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B8E9C50C20E01CCA00BA74A9 /* Build configuration list for PBXNativeTarget "Summer" */;
@@ -311,6 +344,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B824C8CD210C2CC400562919 /* PBXTargetDependency */,
 			);
 			name = SummerEngine;
 			productName = SummerEngine;
@@ -327,6 +361,9 @@
 				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "Taylor Whatley";
 				TargetAttributes = {
+					B824C8C4210C26CE00562919 = {
+						CreatedOnToolsVersion = 10.0;
+					};
 					B8E9C4FB20E01CC800BA74A9 = {
 						CreatedOnToolsVersion = 10.0;
 						SystemCapabilities = {
@@ -359,6 +396,7 @@
 			targets = (
 				B8E9C4FB20E01CC800BA74A9 /* Summer */,
 				B8E9C51E20E0200900BA74A9 /* SummerEngine */,
+				B824C8C4210C26CE00562919 /* SummerShaders */,
 			);
 		};
 /* End PBXProject section */
@@ -368,6 +406,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B824C8CF210C2DBA00562919 /* SummerShaders.metallib in Resources */,
 				B808E99120FEAF2A004A9A34 /* myguy2.png in Resources */,
 				B80559D620EA68E700F7B749 /* fourty.png in Resources */,
 				B808E99020FEAF2A004A9A34 /* myguy1.png in Resources */,
@@ -391,6 +430,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B824C8C3210C26CE00562919 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B824C8C8210C26CE00562919 /* SummerShaders.metal in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B8E9C4F820E01CC800BA74A9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -401,7 +448,6 @@
 				B8098F3520E28045008A180B /* SummerController.swift in Sources */,
 				B8E9C50020E01CC900BA74A9 /* AppDelegate.swift in Sources */,
 				B87612A12104FFC600235E8E /* SummerParticles.swift in Sources */,
-				B8C57E5C20F6C6DC007F06DC /* SummerShaders.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -434,6 +480,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		B824C8CD210C2CC400562919 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B824C8C4210C26CE00562919 /* SummerShaders */;
+			targetProxy = B824C8CC210C2CC400562919 /* PBXContainerItemProxy */;
+		};
 		B8E9C52520E0200900BA74A9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B8E9C51E20E0200900BA74A9 /* SummerEngine */;
@@ -453,6 +504,28 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		B824C8CA210C26CE00562919 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 29ZQB5VV8B;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B824C8CB210C26CE00562919 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 29ZQB5VV8B;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		B8E9C50A20E01CCA00BA74A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -673,6 +746,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B824C8C9210C26CE00562919 /* Build configuration list for PBXNativeTarget "SummerShaders" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B824C8CA210C26CE00562919 /* Debug */,
+				B824C8CB210C26CE00562919 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		B8E9C4F720E01CC800BA74A9 /* Build configuration list for PBXProject "Summer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
