@@ -39,13 +39,6 @@ public struct SummerSettings {
     /// A factor that can flip or stretch objects vertically.
     public var verticalAmp: Float = -1
     
-    /// If true, all objects will be deleted when their deinitializer is called.
-    public var deleteObjectsOnDealloc = false
-    /// If true, all textures will be deleted when their deinitializer is called.
-    public var deleteTexturesOnDealloc = false
-    /// If true, all transforms will be deleted when their deinitializer is called.
-    public var deleteTransformsOnDealloc = false
-    
     /// If true and an object is created it will be initialized with its own transform.
     public var autoMakeTransformWithObject = false
     /// If true and an object is created it will be initialized with its own draw.
@@ -57,7 +50,7 @@ public struct SummerSettings {
     public var conserveModifyMemory = false
     
     /// If a location is not specified while creating a texture, this value will be used.
-    public var defaultTextureLocation = SummerFileLocation.inBundle
+    public var defaultTextureLocation = SummerFileLocation.bundle
     
     /// If true, SummerEngine will print allocation messages.
     public var debugPrintAllocationMessages = false

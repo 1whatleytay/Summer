@@ -18,7 +18,12 @@ class SummerController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        engine = try? SummerEngine(SummerParticles(), view: summerView)
+        var features = SummerFeatures()
+        
+        features.textureAllocWidth = 3000
+        features.textureAllocHeight = 3000
+        
+        engine = try? SummerEngine(Editor(), view: summerView, features: features)
         
         if engine == nil { print("Failed to start SummerEngine.") }
     }

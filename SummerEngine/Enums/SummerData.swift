@@ -8,9 +8,9 @@
 
 /// The location of a file path.
 ///
-/// - inFolder: The file path is global.
-/// - inBundle: The file path is relative to the application.
+/// - folder: The file path is global.
+/// - bundle: The file path is relative to the application.
 public enum SummerFileLocation {
-    case inFolder
-    case inBundle
+    case folder
+    case bundle
 }

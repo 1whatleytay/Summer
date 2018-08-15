@@ -22,7 +22,7 @@ class SummerMapTest: SummerProgram {
         
         engine.settings.messageHandler = { message in print(message) }
         
-        tileset = engine.makeTileset(fromFiles: ["heroes.png", "review.png", "thousand.png"])
+        tileset = engine.makeTileset(tileWidth: 1, tileHeight: 1, data: [[1.0, 1.0, 1.0, 1.0]])
         
         let mapData = [
             0, 0, 0, 1,

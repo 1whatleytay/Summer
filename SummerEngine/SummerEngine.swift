@@ -40,10 +40,13 @@ import MetalKit
     - Buttons and Better Events
     - Batch Tileset/Animation loading
     - Make Object Constructors Dedicated (so overriding works well)
+    - Animation Improvements (seperate timers)
+    - duplicate() methods for all
  
  Just in case I forget:
     - Set Object/Transform space to 0 on delete in SummerFeatures
     - Merge unit and display detection functions (should be same unit)
+    - Update SummerDraw's makeObject functions
  
  Fixes:
     - Mouse flipping should not be using Units (exclusively, mostly Amps) and should be applied to x and y
@@ -84,6 +87,16 @@ public class SummerEngine : NSObject, MTKViewDelegate {
     public private(set) var globalDraw: SummerDraw!
     /// By default, an object uses this transform.
     public private(set) var globalTransform: SummerTransform!
+    
+    public var defaultObjectDraw: SummerDraw {
+        get { return settings.autoMakeDrawWithObject ? makeDraw() : globalDraw }
+    }
+    public var defaultObjectTransform: SummerTransform {
+        get { return settings.autoMakeTransformWithObject ? makeTransform() : globalTransform }
+    }
+    public var defaultMapTransform: SummerTransform {
+        get { return settings.autoMakeTranformWithMap ? makeTransform() : globalTransform }
+    }
     
     private let mapPipelineState: MTLRenderPipelineState
     internal var maps = [SummerMap]()
@@ -169,8 +182,8 @@ public class SummerEngine : NSObject, MTKViewDelegate {
                 renderEncoder.setVertexBuffer(transformBuffer, offset: 0, index: 1)
                 renderEncoder.setVertexBuffer(pivotBuffer, offset: 0, index: 2)
                 renderEncoder.setFragmentTexture(texture, index: 0)
-                globalDraw.addDraws(encoder: renderEncoder)
                 for draw in draws { draw.addDraws(encoder: renderEncoder) }
+                globalDraw.addDraws(encoder: renderEncoder)
                 
                 renderEncoder.endEncoding()
             }
@@ -215,7 +228,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         textureAllocationData = [Bool](repeating: false,
                                        count: features.textureAllocWidth * features.textureAllocHeight)
         
-        globalDraw = SummerDraw(nil)
+        globalDraw = SummerDraw(self)
         globalTransform = SummerTransform(self)
         draws.removeAll()
         maps.removeAll()
@@ -456,7 +469,7 @@ public class SummerEngine : NSObject, MTKViewDelegate {
         
         super.init()
         
-        globalDraw = SummerDraw(nil, isGlobal: true)
+        globalDraw = SummerDraw(self, isGlobal: true)
         globalTransform = SummerTransform(self, isGlobal: true)
         
         if !view.setEngine(engine: self) { throw SummerError.viewInUse }

@@ -30,12 +30,12 @@ public class SummerTexture {
     ///   - file: A path to an image file.
     ///   - location: The location of the image file. .inBundle for relative, .inFolder for global.
     /// - Returns: A tuple containing the image size and pixel data.
-    public static func getTextureData(fromFile file: String, _ location: SummerFileLocation) ->
+    public static func getTextureData(fromFile file: String, in location: SummerFileLocation) ->
         (width: Int, height: Int, data: [Float])? {
             var imageData: [Float]
             var width = 0, height = 0
             
-            if let image = location == .inFolder ? NSImage(contentsOfFile: file) : NSImage(named: file) {
+            if let image = location == .folder ? NSImage(contentsOfFile: file) : NSImage(named: file) {
                 width = Int(image.size.width)
                 height = Int(image.size.height)
                 
@@ -115,7 +115,7 @@ public class SummerTexture {
         if x + width > self.x + self.width || y + height > self.y + self.height { return nil }
         return SummerTexture(parent,
                              x: self.x + x, y: self.y + y,
-                             width: self.width + width, height: self.height + height)
+                             width: width, height: height)
     }
     
     /// Edits a region of the texture.
@@ -143,7 +143,7 @@ public class SummerTexture {
         }
     }
     
-    deinit { if parent.settings.deleteTexturesOnDealloc { delete() } }
+    deinit { delete() }
     
     private init(_ parent: SummerEngine, x: Int, y: Int, width: Int, height: Int) {
         self.parent = parent
@@ -171,25 +171,5 @@ public class SummerTexture {
         self.init(parent, x: pos.x, y: pos.y, width: width, height: height)
         
         allocate()
-    }
-    
-    internal convenience init(_ parent: SummerEngine, width: Int, height: Int, data: [Float]) {
-        var subData = [UInt8](repeating: 0, count: data.count)
-        for i in 0 ..< data.count {
-            subData[i] = UInt8(data[i] * 255)
-        }
-        
-        self.init(parent, width: width, height: height, data: subData)
-    }
-    
-    internal convenience init?(_ parent: SummerEngine, fromFile file: String, _ location: SummerFileLocation = .inFolder) {
-        guard let texData = SummerTexture.getTextureData(fromFile: file, location)
-            else { return nil }
-        
-        self.init(parent, width: texData.width, height: texData.height, data: texData.data)
-    }
-    
-    internal convenience init?(_ parent: SummerEngine, fromFile file: String) {
-        self.init(parent, fromFile: file, parent.settings.defaultTextureLocation)
     }
 }

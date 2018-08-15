@@ -14,6 +14,7 @@ open class SummerObject {
     private let parent: SummerEngine
     private let objectId: Int
     
+    private let deleteOnDealloc: Bool
     internal var modified = false
 
     /// The x coordinate of the object (in units).
@@ -278,7 +279,7 @@ open class SummerObject {
         parent.objectAllocationData[objectId] = false
     }
     
-    deinit { if parent.settings.deleteObjectsOnDealloc { delete() } }
+    deinit { if deleteOnDealloc { delete() } }
     
     /// Constructor.
     /// Please use SummerEngine.makeObject() for creating raw objects.
@@ -300,7 +301,8 @@ open class SummerObject {
                             x: Float, y: Float,
                             width: Float, height: Float,
                             texture: SummerTexture,
-                            isVisible: Bool = true) {
+                            isVisible: Bool = true,
+                            autoDelete: Bool = true) {
         var objectId = SummerObject.allocate(parent)
         
         if objectId == -1 {
@@ -323,208 +325,13 @@ open class SummerObject {
         self._draw = draw
         self._isVisible = isVisible
         if isVisible { draw.addIndex(index: objectId) }
+        self.deleteOnDealloc = autoDelete
         
-        self._transform = parent.globalTransform
+        self._transform = transform
         transform.pivot(objectId: objectId)
         
         save()
         
         allocate()
-    }
-    
-    /// Constructor.
-    /// Please use SummerEngine.makeObject() for creating raw objects.
-    /// This constructor is for creating subclasses.
-    ///
-    /// - Parameters:
-    ///   - parent: The parent engine.
-    ///   - draw: The parent draw.
-    ///   - x: The x position of the object.
-    ///   - y: The y position of the object.
-    ///   - width: The width of the object.
-    ///   - height: The height of the object.
-    ///   - texture: The texture of the object.
-    ///   - isVisible: If false, the object will not be shown by default.
-    internal convenience init(_ parent: SummerEngine,
-                            draw: SummerDraw,
-                            x: Float, y: Float,
-                            width: Float, height: Float,
-                            texture: SummerTexture,
-                            isVisible: Bool = true) {
-        self.init(parent,
-                  draw: draw,
-                  transform: parent.settings.autoMakeTransformWithObject ? parent.makeTransform() : parent.globalTransform,
-                  x: x, y: y,
-                  width: width, height: height,
-                  texture: texture,
-                  isVisible: isVisible)
-    }
-    
-    /// Constructor.
-    /// Please use SummerEngine.makeObject() for creating raw objects.
-    /// This constructor is for creating subclasses.
-    ///
-    /// - Parameters:
-    ///   - parent: The parent engine.
-    ///   - transform: The transform of the object.
-    ///   - x: The x position of the object.
-    ///   - y: The y position of the object.
-    ///   - width: The width of the object.
-    ///   - height: The height of the object.
-    ///   - texture: The texture of the object.
-    ///   - isVisible: If false, the object will not be shown by default.
-    internal convenience init(_ parent: SummerEngine,
-                            transform: SummerTransform,
-                            x: Float, y: Float,
-                            width: Float, height: Float,
-                            texture: SummerTexture,
-                            isVisible: Bool = true) {
-        self.init(parent,
-                  draw: parent.settings.autoMakeDrawWithObject ? parent.makeDraw() : parent.globalDraw,
-                  transform: transform,
-                  x: x, y: y,
-                  width: width, height: height,
-                  texture: texture,
-                  isVisible: isVisible)
-    }
-    
-    /// Constructor.
-    /// Please use SummerEngine.makeObject() for creating raw objects.
-    /// This constructor is for creating subclasses.
-    ///
-    /// - Parameters:
-    ///   - parent: The parent engine.
-    ///   - x: The x position of the object.
-    ///   - y: The y position of the object.
-    ///   - width: The width of the object.
-    ///   - height: The height of the object.
-    ///   - texture: The texture of the object.
-    ///   - isVisible: If false, the object will not be shown by default.
-    internal convenience init(_ parent: SummerEngine,
-                            x: Float, y: Float,
-                            width: Float, height: Float,
-                            texture: SummerTexture,
-                            isVisible: Bool = true) {
-        self.init(parent,
-                  draw: parent.settings.autoMakeDrawWithObject ? parent.makeDraw() : parent.globalDraw,
-                  transform: parent.settings.autoMakeTransformWithObject ? parent.makeTransform() : parent.globalTransform,
-                  x: x, y: y,
-                  width: width, height: height,
-                  texture: texture,
-                  isVisible: isVisible)
-    }
-    
-    /// Constructor.
-    /// Please use SummerEngine.makeObject() for creating raw objects.
-    /// This constructor is for creating subclasses.
-    ///
-    /// - Parameters:
-    ///   - parent: The parent engine.
-    ///   - draw: The parent draw.
-    ///   - transform: The transform of the object.
-    ///   - x: The x position of the object.
-    ///   - y: The y position of the object.
-    ///   - width: The width of the object.
-    ///   - height: The height of the object.
-    ///   - animation: The animation that will be animating this object.
-    ///   - isVisible: If false, the object will not be shown by default.
-    internal convenience init(_ parent: SummerEngine,
-                            draw: SummerDraw,
-                            transform: SummerTransform,
-                            x: Float, y: Float,
-                            width: Float, height: Float,
-                            animation: SummerAnimation,
-                            isVisible: Bool = true) {
-        self.init(parent,
-                  draw: draw,
-                  transform: transform,
-                  x: x, y: y,
-                  width: width, height: height,
-                  texture: parent.makeNilTexture(),
-                  isVisible: isVisible)
-        
-        self.animation = animation
-    }
-    
-    /// Constructor.
-    /// Please use SummerEngine.makeObject() for creating raw objects.
-    /// This constructor is for creating subclasses.
-    ///
-    /// - Parameters:
-    ///   - parent: The parent engine.
-    ///   - draw: The parent draw.
-    ///   - x: The x position of the object.
-    ///   - y: The y position of the object.
-    ///   - width: The width of the object.
-    ///   - height: The height of the object.
-    ///   - animation: The animation that will be animating this object.
-    ///   - isVisible: If false, the object will not be shown by default.
-    internal convenience init(_ parent: SummerEngine,
-                            draw: SummerDraw,
-                            x: Float, y: Float,
-                            width: Float, height: Float,
-                            animation: SummerAnimation,
-                            isVisible: Bool = true) {
-        self.init(parent,
-                  draw: draw,
-                  transform: parent.settings.autoMakeTransformWithObject ? parent.makeTransform() : parent.globalTransform,
-                  x: x, y: y,
-                  width: width, height: height,
-                  animation: animation,
-                  isVisible: isVisible)
-    }
-    
-    /// Constructor.
-    /// Please use SummerEngine.makeObject() for creating raw objects.
-    /// This constructor is for creating subclasses.
-    ///
-    /// - Parameters:
-    ///   - parent: The parent engine.
-    ///   - transform: The transform of the object.
-    ///   - x: The x position of the object.
-    ///   - y: The y position of the object.
-    ///   - width: The width of the object.
-    ///   - height: The height of the object.
-    ///   - animation: The animation that will be animating this object.
-    ///   - isVisible: If false, the object will not be shown by default.
-    internal convenience init(_ parent: SummerEngine,
-                            transform: SummerTransform,
-                            x: Float, y: Float,
-                            width: Float, height: Float,
-                            animation: SummerAnimation,
-                            isVisible: Bool = true) {
-        self.init(parent,
-                  draw: parent.settings.autoMakeDrawWithObject ? parent.makeDraw() : parent.globalDraw,
-                  transform: transform,
-                  x: x, y: y,
-                  width: width, height: height,
-                  animation: animation,
-                  isVisible: isVisible)
-    }
-    
-    /// Constructor.
-    /// Please use SummerEngine.makeObject() for creating raw objects.
-    /// This constructor is for creating subclasses.
-    ///
-    /// - Parameters:
-    ///   - parent: The parent engine.
-    ///   - x: The x position of the object.
-    ///   - y: The y position of the object.
-    ///   - width: The width of the object.
-    ///   - height: The height of the object.
-    ///   - animation: The animation that will be animating this object.
-    ///   - isVisible: If false, the object will not be shown by default.
-    internal convenience init(_ parent: SummerEngine,
-                            x: Float, y: Float,
-                            width: Float, height: Float,
-                            animation: SummerAnimation,
-                            isVisible: Bool = true) {
-        self.init(parent,
-                  draw: parent.settings.autoMakeDrawWithObject ? parent.makeDraw() : parent.globalDraw,
-                  transform: parent.settings.autoMakeTransformWithObject ? parent.makeTransform() : parent.globalTransform,
-                  x: x, y: y,
-                  width: width, height: height,
-                  animation: animation,
-                  isVisible: isVisible)
     }
 }

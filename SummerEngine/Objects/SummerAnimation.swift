@@ -16,14 +16,19 @@ public class SummerAnimation: NSObject {
     private var objects = [SummerObject]()
     
     private var timer: Timer!
-    private var tick = 0
+    private var tick: Int
+    
+    public let animationRate: Double
+    
+    /// Returns the texture this animation is currently displaying.
+    public var currentTexture: SummerTexture {
+        get { return textures[tick % textures.count] }
+    }
     
     /// Moves the animation ahead a frame.
     public func step() {
-        print(tick)
         tick += 1
-        let texture = textures[tick % textures.count]
-        for object in objects { object.texture(texture) }
+        for object in objects { object.texture(currentTexture) }
     }
     
     private func callStep(t: Timer) { step() }
@@ -58,52 +63,24 @@ public class SummerAnimation: NSObject {
         }
     }
     
-    internal init(_ parent: SummerEngine, textures: [SummerTexture], animationRate: Double) {
+    /// Creates a copy of this animation.
+    ///
+    /// - Parameter sameTick: If true, the duplicate animation will start at the same frame as this animation.
+    /// - Returns: An animation object.
+    public func duplicate(sameTick: Bool = false) -> SummerAnimation {
+        return SummerAnimation(parent, textures: textures, animationRate: animationRate, tick: sameTick ? tick : 0)
+    }
+    
+    internal init(_ parent: SummerEngine, textures: [SummerTexture], animationRate: Double, tick: Int = 0) {
         self.parent = parent
-        self.textures = textures
+        self.tick = tick
+        self.animationRate = animationRate
+        
+        if textures.count < 1 { self.textures = [parent.makeNilTexture()] }
+        else { self.textures = textures }
         
         super.init()
         
         timer = Timer.scheduledTimer(withTimeInterval: animationRate, repeats: true) { _ in self.step() }
-    }
-    
-    internal convenience init(_ parent: SummerEngine,
-                              widths: [Int], heights: [Int],
-                              data: [[UInt8]],
-                              animationRate: Double) {
-        var textures = [SummerTexture](repeating: parent.makeNilTexture(), count: data.count)
-        for i in 0 ..< textures.count {
-            textures[i] = parent.makeTexture(width: widths[i], height: heights[i], data: data[i])
-        }
-        
-        self.init(parent, textures: textures, animationRate: animationRate)
-    }
-    
-    internal convenience init(_ parent: SummerEngine,
-                              widths: [Int], heights: [Int],
-                              data: [[Float]],
-                              animationRate: Double) {
-        var textures = [SummerTexture](repeating: parent.makeNilTexture(), count: data.count)
-        for i in 0 ..< textures.count {
-            textures[i] = parent.makeTexture(width: widths[i], height: heights[i], data: data[i])
-        }
-        
-        self.init(parent, textures: textures, animationRate: animationRate)
-    }
-    
-    internal convenience init?(_ parent: SummerEngine,
-                               fromFiles files: [String],
-                               _ location: SummerFileLocation,
-                               animationRate: Double) {
-        guard let tiles = SummerTileset.getTilesetData(fromFiles: files, location)
-            else { return nil }
-        
-        self.init(parent, widths: tiles.tileWidths, heights: tiles.tileHeights, data: tiles.data, animationRate: animationRate)
-    }
-    
-    internal convenience init?(_ parent: SummerEngine,
-                               fromFiles files: [String],
-                               animationRate: Double) {
-        self.init(parent, fromFiles: files, parent.settings.defaultTextureLocation, animationRate: animationRate)
     }
 }

@@ -11,7 +11,7 @@ import Metal
 
 /// A class for handling groups of objects and the z-axis.
 public class SummerDraw {
-    private let parent: SummerEngine?
+    private let parent: SummerEngine
     
     private struct SummerRange {
         public var start, count: Int
@@ -29,11 +29,11 @@ public class SummerDraw {
     internal let isGlobal: Bool
     
     private func getIndexInParent() -> Int {
-        if parent == nil { return -1 }
+        if isGlobal { return -1 }
         
         var findLoc = -1
-        for i in 0 ..< parent!.draws.count {
-            if parent!.draws[i] === self { findLoc = i }
+        for i in 0 ..< parent.draws.count {
+            if parent.draws[i] === self { findLoc = i }
         }
         
         return findLoc
@@ -43,14 +43,14 @@ public class SummerDraw {
     public func setActive() {
         let index = getIndexInParent()
         
-        if index == -1 { parent?.draws.append(self) }
+        if index == -1 { parent.draws.append(self) }
     }
     
     /// Deactivates the draw. The contents of the draw will no longer be drawn.
     public func setDeactive() {
         let index = getIndexInParent()
         
-        if index != -1 { parent?.draws.remove(at: index) }
+        if index != -1 { parent.draws.remove(at: index) }
     }
     
     private func mergeConcurrentRanges(rangeIndex: Int) {
@@ -98,17 +98,14 @@ public class SummerDraw {
     }
     
     internal func removeIndex(index: Int) {
-        var hasFailed = true
         for i in 0 ..< ranges.count {
             if ranges[i].start == index {
                 ranges[i].count -= 1
                 ranges[i].start += 1
                 if ranges[i].count <= 0 { ranges.remove(at: i) }
-                hasFailed = false
             } else if ranges[i].end == index {
                 ranges[i].count -= 1
                 if ranges[i].count <= 0 { ranges.remove(at: i) }
-                hasFailed = false
             } else if ranges[i].start < index && ranges[i].end > index {
                 let tempCount = ranges[i].count
                 ranges[i].count = index - ranges[i].start
@@ -117,11 +114,9 @@ public class SummerDraw {
                     count: tempCount - (ranges[i].count + 1)
                 )
                 ranges.append(newRange)
-                hasFailed = false
             } else { continue }
             break
         }
-        if hasFailed { print("Failure!") }
     }
     
     /// Adds an object to the draw.
@@ -143,8 +138,9 @@ public class SummerDraw {
         x: Float, y: Float,
         width: Float, height: Float,
         texture: SummerTexture) -> SummerObject {
-        return SummerObject(parent!,
+        return SummerObject(parent,
                             draw: self,
+                            transform: parent.defaultObjectTransform,
                             x: x, y: y,
                             width: width, height: height,
                             texture: texture)
@@ -157,7 +153,7 @@ public class SummerDraw {
         let loc = getIndexInParent()
         if loc == -1 { return }
         
-        let objectDraws = parent!.draws
+        let objectDraws = parent.draws
         let newLoc = loc - Int(amount)
         
         objectDraws.remove(at: loc)
@@ -170,7 +166,7 @@ public class SummerDraw {
     public func moveForward(byAmount amount: UInt = 1) {
         let loc = getIndexInParent()
         
-        let objectDraws = parent!.draws
+        let objectDraws = parent.draws
         let newLoc = loc + Int(amount)
         
         objectDraws.remove(at: loc)
@@ -188,7 +184,7 @@ public class SummerDraw {
         let loc = getIndexInParent(), otherLoc = otherDraw.getIndexInParent()
         if loc == -1 || otherLoc == -1 { return }
         
-        let objectDraws = parent!.draws
+        let objectDraws = parent.draws
         let newLoc = otherLoc - 1
         
         objectDraws.remove(at: loc)
@@ -202,7 +198,7 @@ public class SummerDraw {
         let loc = getIndexInParent(), otherLoc = otherDraw.getIndexInParent()
         if loc == -1 || otherLoc == -1 { return }
         
-        let objectDraws = parent!.draws
+        let objectDraws = parent.draws
         let newLoc = otherLoc + 1
         
         objectDraws.remove(at: loc)
@@ -218,8 +214,8 @@ public class SummerDraw {
         let loc = getIndexInParent()
         if loc == -1 { return }
         
-        parent!.draws.remove(at: loc)
-        parent!.draws.insert(self, at: 0)
+        parent.draws.remove(at: loc)
+        parent.draws.insert(self, at: 0)
     }
     
     /// Moves this draw to the closest z-axis possible.
@@ -227,8 +223,8 @@ public class SummerDraw {
         let loc = getIndexInParent()
         if loc == -1 { return }
         
-        parent!.draws.remove(at: loc)
-        parent!.draws.append(self)
+        parent.draws.remove(at: loc)
+        parent.draws.append(self)
     }
     
     internal func addDraws(encoder: MTLRenderCommandEncoder) {
@@ -239,7 +235,7 @@ public class SummerDraw {
         }
     }
     
-    internal init(_ parent: SummerEngine?, isGlobal: Bool = false) {
+    internal init(_ parent: SummerEngine, isGlobal: Bool = false) {
         self.parent = parent
         self.isGlobal = isGlobal
         

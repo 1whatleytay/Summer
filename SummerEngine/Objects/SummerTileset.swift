@@ -31,7 +31,7 @@ public class SummerTileset {
     ///   - files: An array of paths to image files.
     ///   - location: The location of the image files.
     /// - Returns: A tuple containing information of each file as an array.
-    public static func getTilesetData(fromFiles files: [String], _ location: SummerFileLocation)
+    public static func getTilesetData(fromFiles files: [String], in location: SummerFileLocation)
         -> (tileWidths: [Int], tileHeights: [Int], data: [[Float]])? {
             if files.count < 1 { return nil }
             
@@ -41,7 +41,7 @@ public class SummerTileset {
             var tileHeights = [Int](repeating: -1, count: files.count)
             
             for i in 0 ..< files.count {
-                guard let imageData = SummerTexture.getTextureData(fromFile: files[i], location)
+                guard let imageData = SummerTexture.getTextureData(fromFile: files[i], in: location)
                     else { return nil }
                 
                 tileWidths[i] = imageData.width
@@ -125,38 +125,5 @@ public class SummerTileset {
             }
             if doneWriting { break }
         }
-    }
-    
-    internal convenience init(_ parent: SummerEngine, tileWidth: Int, tileHeight: Int, data: [[Float]], alloc: Int = 0) {
-        var subdata = [[UInt8]](repeating: [UInt8](repeating: 0, count: tileWidth * tileHeight * 4), count: data.count)
-        
-        for i in 0 ..< data.count {
-            for s in 0 ..< data[i].count {
-                subdata[i][s] = UInt8(data[i][s] * 255)
-            }
-        }
-        
-        self.init(parent, tileWidth: tileWidth, tileHeight: tileHeight, data: subdata, alloc: alloc)
-    }
-    
-    internal convenience init?(_ parent: SummerEngine,
-                               fromFiles files: [String],
-                               _ location: SummerFileLocation,
-                               alloc: Int = 0) {
-        guard let tilesetData = SummerTileset.getTilesetData(fromFiles: files, location)
-            else {
-                parent.settings.messageHandler?(.couldNotLoadTileset)
-                return nil
-        }
-        
-        self.init(parent,
-                  tileWidth: tilesetData.tileWidths[0],
-                  tileHeight: tilesetData.tileHeights[0],
-                  data: tilesetData.data,
-                  alloc: alloc)
-    }
-    
-    internal convenience init?(_ parent: SummerEngine, fromFiles files: [String], alloc: Int = 0) {
-        self.init(parent, fromFiles: files, parent.settings.defaultTextureLocation, alloc: alloc)
     }
 }

@@ -233,9 +233,17 @@ public class SummerTransform {
         parent.transformAllocationData[transformId] = false
     }
     
-    deinit { if parent.settings.deleteTransformsOnDealloc { delete() } }
+    deinit { delete() }
     
-    private init(_ parent: SummerEngine, transformId: Int, isGlobal: Bool) {
+    internal init(_ parent: SummerEngine, isGlobal: Bool = false) {
+        var transformId = SummerTransform.allocate(parent)
+        if transformId == -1 {
+            let success = parent.clearTransformSpace()
+            
+            if success { transformId = SummerTransform.allocate(parent) }
+            else { parent.settings.messageHandler?(.outOfTransformMemory) }
+        }
+        
         self.parent = parent
         self.transformId = transformId
         self.isGlobal = isGlobal
@@ -247,18 +255,6 @@ public class SummerTransform {
                              Float(parent.settings.displayHeight) / 2)
         
         save()
-    }
-    
-    internal convenience init(_ parent: SummerEngine, isGlobal: Bool = false) {
-        var transformId = SummerTransform.allocate(parent)
-        if transformId == -1 {
-            let success = parent.clearTransformSpace()
-            
-            if success { transformId = SummerTransform.allocate(parent) }
-            else { parent.settings.messageHandler?(.outOfTransformMemory) }
-        }
-        
-        self.init(parent, transformId: transformId, isGlobal: isGlobal)
         
         allocate()
     }
