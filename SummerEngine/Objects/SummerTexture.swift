@@ -12,8 +12,29 @@ import AppKit
 /// Represents an image that can be shown on screen.
 public class SummerTexture {
     private let parent: SummerEngine
+    private let sampled: Bool
     internal let x, y, width, height: Int
     internal let vertX1, vertX2, vertY1, vertY2: Float
+    
+    public static func fill(color: SummerColor, width: Int, height: Int) -> [UInt8] {
+        var data = [UInt8](repeating: 0, count: width * height * 4)
+        for loc in 0 ..< width * height {
+            data[loc] = UInt8(color.red * 255)
+            data[loc] = UInt8(color.green * 255)
+            data[loc] = UInt8(color.blue * 255)
+            data[loc] = UInt8(color.alpha * 255)
+        }
+        return data
+    }
+    
+    public static func convert(data: [Float]) -> [UInt8] {
+        var subdata = [UInt8](repeating: 0, count: data.count)
+        for i in 0 ..< data.count {
+            subdata[i] = UInt8(data[i] * 255)
+        }
+        
+        return subdata
+    }
     
     internal static func makeNil(_ parent: SummerEngine) -> SummerTexture {
         return SummerTexture(parent, x: 0, y: 0, width: 0, height: 0)
@@ -90,9 +111,6 @@ public class SummerTexture {
     }
     
     internal func allocate() {
-        if parent.settings.debugPrintAllocationMessages {
-            print("Allocated texture: \(x), \(y) -> (\(width), \(height))")
-        }
         for x in 0 ..< width {
             for y in 0 ..< height {
                 parent.textureAllocationData[
@@ -111,20 +129,21 @@ public class SummerTexture {
     ///   - width: The width of the sampled texture (in pixels).
     ///   - height: The height of the sampled texture (in pixels).
     /// - Returns: The texture object that was sampled.
-    public func sample(x: Int, y: Int, width: Int, height: Int) -> SummerTexture? {
-        if x + width > self.x + self.width || y + height > self.y + self.height { return nil }
+    public func sample(x: Int, y: Int, width: Int, height: Int) -> SummerTexture {
+        if x + width > self.x + self.width || y + height > self.y + self.height { return parent.makeNilTexture() }
         return SummerTexture(parent,
                              x: self.x + x, y: self.y + y,
-                             width: width, height: height)
+                             width: width, height: height,
+                             sampled: true)
     }
     
     /// Edits a region of the texture.
     ///
     /// - Parameters:
-    ///   - x: The x coordinate of the texture to be replaced.
-    ///   - y: The y coordinate of the texture to be replaced.
-    ///   - replaceWidth: The width of the replacement.
-    ///   - replaceHeight: The height of the replacement.
+    ///   - x: The x coordinate of the region in the texture that will be replaced.
+    ///   - y: The y coordinate of the region in the texture that will be replaced.
+    ///   - replaceWidth: The width of the region.
+    ///   - replaceHeight: The height of the region.
     ///   - data: The data to replace the region.
     public func edit(x: Int, y: Int, replaceWidth: Int, replaceHeight: Int, data: [UInt8]) {
         if x < 0 || y < 0 || width < 0 || height < 0 { return }
@@ -134,6 +153,59 @@ public class SummerTexture {
                                mipmapLevel: 0, withBytes: data, bytesPerRow: width * 4)
     }
     
+    /// Edits a region of the texture.
+    ///
+    /// - Parameters:
+    ///   - x: The x coordinate of the region in the texture that will be replaced.
+    ///   - y: The y coordinate of the region in the texture that will be replaced.
+    ///   - replaceWidth: The width of the region.
+    ///   - replaceHeight: The height of the region.
+    ///   - data: The data to replace the region.
+    public func edit(x: Int, y: Int, replaceWidth: Int, replaceHeight: Int, data: [Float]) {
+        edit(x: x, y: y, replaceWidth: replaceWidth, replaceHeight: replaceHeight, data: SummerTexture.convert(data: data))
+    }
+    
+    /// Edits a region of the texture.
+    ///
+    /// - Parameters:
+    ///   - x: The x coordinate of the pixel to be replaced.
+    ///   - y: The y coordinate of the pixel to be replaced.
+    ///   - color: The new color of the pixel.
+    public func edit(x: Int, y: Int, color: SummerColor) {
+        edit(x: x, y: y, replaceWidth: 1, replaceHeight: 1, data: color.data)
+    }
+    
+    /// Creates a new texture with the same properties.
+    ///
+    /// - Returns: A duplicate texture.
+    public func duplicate() -> SummerTexture {
+        let pos = SummerTexture.allocate(parent, width: width, height: height)
+        
+        if pos.x == -1 {
+            parent.settings.messageHandler?(.outOfTextureMemory)
+        } else {
+            if let commandBuffer = parent.commandQueue.makeCommandBuffer() {
+                if let blit = commandBuffer.makeBlitCommandEncoder() {
+                    blit.copy(from: parent.texture,
+                              sourceSlice: 0, sourceLevel: 0,
+                              sourceOrigin: MTLOriginMake(x, y, 0),
+                              sourceSize: MTLSizeMake(width, height, 0),
+                              to: parent.texture,
+                              destinationSlice: 0, destinationLevel: 0,
+                              destinationOrigin: MTLOriginMake(pos.x, pos.y, 0))
+                    blit.endEncoding()
+                }
+                commandBuffer.commit()
+                
+                let texture = SummerTexture(parent, x: pos.x, y: pos.y, width: width, height: height)
+                texture.allocate()
+                return texture
+            } else { return parent.makeNilTexture() }
+        }
+        
+        return parent.makeNilTexture()
+    }
+    
     /// Frees all resources used by this texture.
     public func delete() {
         for sX in 0 ..< width {
@@ -141,12 +213,18 @@ public class SummerTexture {
                 parent.textureAllocationData[x + sX + (y + sY) * parent.features.textureAllocWidth] = true
             }
         }
+        
+        if parent.settings.clearDeletedMemory {
+            
+        }
     }
     
-    deinit { delete() }
+    deinit { if !sampled { delete() } }
     
-    private init(_ parent: SummerEngine, x: Int, y: Int, width: Int, height: Int) {
+    private init(_ parent: SummerEngine, x: Int, y: Int, width: Int, height: Int, sampled: Bool = false) {
         self.parent = parent
+        
+        self.sampled = sampled
         
         self.x = x
         self.y = y

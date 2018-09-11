@@ -17,10 +17,9 @@ public class SummerTransform {
     
     private let parent: SummerEngine
     private let transformId: Int
-    internal let isGlobal: Bool
+    public let isGlobal: Bool
     
     internal var modified = false
-    private var isDisposable = false
     
     /// The transform's matrix. Used for rotations and scaling.
     public var matrix: float2x2
@@ -35,8 +34,8 @@ public class SummerTransform {
     
     private func data() -> [Float] {
         return [
-            matrix[0, 0], matrix[0, 1],
-            matrix[1, 0], matrix[1, 1],
+            matrix[0, 0], matrix[1, 0],
+            matrix[0, 1], matrix[1, 1],
             offset.x * parent.settings.horizontalUnit * parent.settings.horizontalAmp,
             offset.y * parent.settings.verticalUnit * parent.settings.verticalAmp,
             (origin.x * parent.settings.horizontalUnit * 2 - 1) * parent.settings.horizontalAmp,
@@ -59,9 +58,7 @@ public class SummerTransform {
     
     internal func allocate() {
         if transformId == -1 { return }
-        if parent.settings.debugPrintAllocationMessages {
-            print("Allocated transform: \(transformId)")
-        }
+        
         parent.transformAllocationData[transformId] = true
     }
     
@@ -87,23 +84,6 @@ public class SummerTransform {
         }
     }
     
-    /// Marks the transform as disposable. The transform will be deleted when the engine is low on memory.
-    public func setDisposable() {
-        if !isDisposable {
-            isDisposable = true
-            parent.transformDisposables.enqueue(self)
-        }
-    }
-    
-    /// Marks the transform as disposable. The transform will be deleted when the engine is low on memory.
-    ///
-    /// - Returns: Self.
-    public func withDisposable() -> SummerTransform {
-        setDisposable()
-        
-        return self
-    }
-    
     internal func pivot(objectId: Int) {
         let start = objectId * SummerTransform.pivotSize
         let end = start + SummerTransform.pivotSize
@@ -122,7 +102,7 @@ public class SummerTransform {
     /// Multiples a custom matrix to the current matrix.
     ///
     /// - Parameter matrix: The matrix to be multiplied.
-    public func change(matrix change: float2x2) {
+    public func multiply(by change: float2x2) {
         matrix = change * matrix
         
         commit()
@@ -218,12 +198,35 @@ public class SummerTransform {
         commit()
     }
     
+    /// Sets the opacity of the transform.
+    ///
+    /// - Parameter opacity: The opacity, 0 being transparent and 1 being fully opaque.
+    public func setOpacity(_ opacity: Float) {
+        self.opacity = opacity
+        
+        commit()
+    }
+    
     /// Sets the origin of the matrix to the center of an object.
     ///
     /// - Parameter object: The object whose center will be used as an origin.
     public func setOrigin(centerOf object: SummerObject) {
         origin.x = object.x + object.width / 2
         origin.y = object.y + object.height / 2
+    }
+    
+    /// Creates a new transform with the same properties.
+    ///
+    /// - Returns: A duplicate transform.
+    public func duplicate() -> SummerTransform{
+        let transform = SummerTransform(parent)
+        
+        transform.multiply(by: matrix)
+        transform.setOffset(x: offset.x, y: offset.y)
+        transform.setOrigin(x: origin.x, y: origin.y)
+        transform.setOpacity(opacity)
+        
+        return transform
     }
     
     /// Frees all resources used by this transform.
@@ -236,13 +239,8 @@ public class SummerTransform {
     deinit { delete() }
     
     internal init(_ parent: SummerEngine, isGlobal: Bool = false) {
-        var transformId = SummerTransform.allocate(parent)
-        if transformId == -1 {
-            let success = parent.clearTransformSpace()
-            
-            if success { transformId = SummerTransform.allocate(parent) }
-            else { parent.settings.messageHandler?(.outOfTransformMemory) }
-        }
+        let transformId = SummerTransform.allocate(parent)
+        if transformId == -1 { parent.settings.messageHandler?(.outOfTransformMemory) }
         
         self.parent = parent
         self.transformId = transformId

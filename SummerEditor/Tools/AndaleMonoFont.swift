@@ -111,6 +111,6 @@ class AndaleMonoFont: MonoFont {
     }
     
     init(_ engine: SummerEngine) {
-        super.init(engine, fromFile: "AndaleMonoSmall.png", gridWidth: 14, gridHeight: 7, idFunc: AndaleMonoFont.fontId)!
+        super.init(engine, fromFile: "AndaleMono.png", gridWidth: 14, gridHeight: 7, idFunc: AndaleMonoFont.fontId)!
     }
 }

@@ -9,7 +9,6 @@
 import SummerEngine
 
 class Particle: SummerObject {
-    public static var parent: SummerEngine!
     public static var color: SummerTexture!
     public static var instances = [Particle]()
     
@@ -38,21 +37,22 @@ class Particle: SummerObject {
     override func delete() {
         super.delete()
         
-        transform.delete()
-        
         Particle.instances.removeAll { (p) -> Bool in return p === self }
     }
     
-    init() {
+    init(_ engine: SummerEngine) {
         let genWidth = Int.random(in: Particle.minSize ... Particle.maxSize),
             genHeight = Int.random(in: Particle.minSize ... Particle.maxSize)
         
         velocityX = Float.random(in: -4 ... 4)
         velocityY = Float.random(in: -4 ... 4)
         
-        super.init(Particle.parent,
-                   draw: Particle.parent.globalDraw, transform: Particle.parent.globalTransform,
-                   x: Particle.spawnX, y: Particle.spawnY, width: Float(genWidth), height: Float(genHeight), texture: Particle.color)
+        super.init(engine,
+                   draw: engine.globalDraw, transform: engine.globalTransform,
+                   x: Particle.spawnX, y: Particle.spawnY,
+                   width: Float(genWidth), height: Float(genHeight),
+                   texture: Particle.color,
+                   autoDelete: false)
         
         makeTransform()
         setDisposable()
@@ -61,7 +61,22 @@ class Particle: SummerObject {
     }
 }
 
-class SummerParticles: SummerProgram {
+class SummerParticles: SummerEntry {
+    func features() -> SummerFeatures {
+        var features = SummerFeatures()
+        
+        features.textureAllocWidth = 100
+        features.textureAllocHeight = 101
+        features.maxObjects = 1000
+        features.maxTransforms = 1000
+        
+        return features
+    }
+    
+    func settings() -> SummerSettings {
+        return SummerSettings()
+    }
+    
     var engine: SummerEngine!
     
     var red, circle: SummerTexture!
@@ -72,18 +87,15 @@ class SummerParticles: SummerProgram {
         circle = engine.makeTexture(fromFile: "circle.png")
         red = engine.makeColor(red: 1, green: 0, blue: 0, alpha: 1)
         
-        Particle.parent = engine
         Particle.color = red
         
-        Particle.spawnX = Float(Particle.parent.settings.displayWidth / 2)
-        Particle.spawnY = Float(Particle.parent.settings.displayHeight / 2)
-        
-        //engine.beforeUpdateEvents.append { Particle.step() }
+        Particle.spawnX = Float(engine.settings.displayWidth / 2)
+        Particle.spawnY = Float(engine.settings.displayHeight / 2)
     }
     
     func update() {
+        _ = Particle(engine)
         Particle.step()
-        _ = Particle()
     }
     
     func key(key: SummerKey, characters: String?, state: SummerInputState) {

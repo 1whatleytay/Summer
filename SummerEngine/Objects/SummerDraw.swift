@@ -26,7 +26,8 @@ public class SummerDraw {
     }
     
     private var ranges = [SummerRange]()
-    internal let isGlobal: Bool
+    public var filter = SummerFilter.nearest
+    public let isGlobal: Bool
     
     private func getIndexInParent() -> Int {
         if isGlobal { return -1 }
@@ -74,6 +75,8 @@ public class SummerDraw {
     internal func isEmpty() -> Bool { return ranges.isEmpty }
     
     internal func addIndex(index: Int) {
+        if ranges.count < 1 { setActive() }
+        
         var foundRange = false
         for i in 0 ..< ranges.count {
             if ranges[i].start - 1 == index {
@@ -117,6 +120,8 @@ public class SummerDraw {
             } else { continue }
             break
         }
+        
+        if ranges.count < 1 { setDeactive() }
     }
     
     /// Adds an object to the draw.
@@ -238,7 +243,5 @@ public class SummerDraw {
     internal init(_ parent: SummerEngine, isGlobal: Bool = false) {
         self.parent = parent
         self.isGlobal = isGlobal
-        
-        setActive()
     }
 }

@@ -30,19 +30,31 @@
 		B824C8C8210C26CE00562919 /* SummerShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = B824C8C7210C26CE00562919 /* SummerShaders.metal */; };
 		B824C8CF210C2DBA00562919 /* SummerShaders.metallib in Resources */ = {isa = PBXBuildFile; fileRef = B824C8C5210C26CE00562919 /* SummerShaders.metallib */; };
 		B826A0B520F2F5CE00ABED4A /* SummerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D25B0520E52D1F005EFF90 /* SummerError.swift */; };
+		B83F3EAD2125F2E600A2D20F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83F3EAC2125F2E600A2D20F /* AppDelegate.swift */; };
+		B83F3EAF2125F2E600A2D20F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83F3EAE2125F2E600A2D20F /* ViewController.swift */; };
+		B83F3EB12125F2E700A2D20F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B83F3EB02125F2E700A2D20F /* Assets.xcassets */; };
+		B83F3EB42125F2E700A2D20F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B83F3EB22125F2E700A2D20F /* Main.storyboard */; };
+		B83F3EBE2125F31A00A2D20F /* SummerEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8E9C51F20E0200900BA74A9 /* SummerEngine.framework */; };
+		B83F3EBF2125F33B00A2D20F /* SummerShaders.metallib in Resources */ = {isa = PBXBuildFile; fileRef = B824C8C5210C26CE00562919 /* SummerShaders.metallib */; };
+		B83F3EC22125F35F00A2D20F /* AndaleMonoFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C3D322211DEED700718428 /* AndaleMonoFont.swift */; };
+		B83F3EC32125F35F00A2D20F /* MonoFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D901A421150C1800CAA59F /* MonoFont.swift */; };
+		B83F3EC42125F35F00A2D20F /* Editor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D901A221150C0000CAA59F /* Editor.swift */; };
+		B83F3EC52125FB6D00A2D20F /* AndaleMono.png in Resources */ = {isa = PBXBuildFile; fileRef = B83F3EC12125F34C00A2D20F /* AndaleMono.png */; };
+		B83F3ECB2126021D00A2D20F /* SummerEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83F3ECA2126021D00A2D20F /* SummerEntry.swift */; };
+		B83F3ECE2127745500A2D20F /* SummerResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83F3ECD2127745500A2D20F /* SummerResource.swift */; };
+		B83F3ED0212774AE00A2D20F /* SummerResourceList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83F3ECF212774AE00A2D20F /* SummerResourceList.swift */; };
 		B845A89520E09F6C000904D3 /* SummerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B845A89420E09F6C000904D3 /* SummerView.swift */; };
 		B84DEE7620F7E3AD00D397A8 /* SummerMapTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84DEE7520F7E3AD00D397A8 /* SummerMapTest.swift */; };
 		B87612A12104FFC600235E8E /* SummerParticles.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87612A02104FFC600235E8E /* SummerParticles.swift */; };
-		B8820ECE2117D05B001EB398 /* AndaleMonoSmall.png in Resources */ = {isa = PBXBuildFile; fileRef = B8820ECD2117D05B001EB398 /* AndaleMonoSmall.png */; };
+		B8820ECE2117D05B001EB398 /* AndaleMono.png in Resources */ = {isa = PBXBuildFile; fileRef = B8820ECD2117D05B001EB398 /* AndaleMono.png */; };
+		B8A4AD33212B5B2800BB3484 /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A4AD32212B5B2800BB3484 /* Box.swift */; };
+		B8A4AD35212B5C4900BB3484 /* SummerColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A4AD34212B5C4900BB3484 /* SummerColor.swift */; };
+		B8A8066D2129CBA700192B3D /* myguy1.png in Resources */ = {isa = PBXBuildFile; fileRef = B8A8066C2129CBA700192B3D /* myguy1.png */; };
 		B8B02E1320F1481000951616 /* SummerTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B02E1220F1481000951616 /* SummerTransform.swift */; };
-		B8C3D323211DEED700718428 /* AndaleMonoFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C3D322211DEED700718428 /* AndaleMonoFont.swift */; };
 		B8C57E5E20F6E876007F06DC /* SummerTileset.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C57E5D20F6E876007F06DC /* SummerTileset.swift */; };
 		B8C57E6020F70364007F06DC /* SummerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C57E5F20F70364007F06DC /* SummerData.swift */; };
 		B8C57E6220F79162007F06DC /* SummerMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C57E6120F79162007F06DC /* SummerMap.swift */; };
 		B8D25B0820E52DAF005EFF90 /* SummerMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D25B0720E52DAF005EFF90 /* SummerMessage.swift */; };
-		B8D901A321150C0000CAA59F /* Editor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D901A221150C0000CAA59F /* Editor.swift */; };
-		B8D901A521150C1800CAA59F /* MonoFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D901A421150C1800CAA59F /* MonoFont.swift */; };
-		B8D901A721150C5300CAA59F /* AndaleMono.png in Resources */ = {isa = PBXBuildFile; fileRef = B8D901A621150C5300CAA59F /* AndaleMono.png */; };
 		B8D9588720F5133600ED5BE7 /* SummerFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D9588620F5133600ED5BE7 /* SummerFeatures.swift */; };
 		B8E9C50020E01CC900BA74A9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E9C4FF20E01CC900BA74A9 /* AppDelegate.swift */; };
 		B8E9C50420E01CCA00BA74A9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B8E9C50320E01CCA00BA74A9 /* Assets.xcassets */; };
@@ -55,6 +67,20 @@
 
 /* Begin PBXContainerItemProxy section */
 		B824C8CC210C2CC400562919 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B8E9C4F420E01CC800BA74A9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B824C8C4210C26CE00562919;
+			remoteInfo = SummerShaders;
+		};
+		B83F3EBA2125F2F700A2D20F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B8E9C4F420E01CC800BA74A9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B8E9C51E20E0200900BA74A9;
+			remoteInfo = SummerEngine;
+		};
+		B83F3EBC2125F2FD00A2D20F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B8E9C4F420E01CC800BA74A9 /* Project object */;
 			proxyType = 1;
@@ -107,10 +133,24 @@
 		B824C8C1210BC4EA00562919 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
 		B824C8C5210C26CE00562919 /* SummerShaders.metallib */ = {isa = PBXFileReference; explicitFileType = "archive.metal-library"; includeInIndex = 0; path = SummerShaders.metallib; sourceTree = BUILT_PRODUCTS_DIR; };
 		B824C8C7210C26CE00562919 /* SummerShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = SummerShaders.metal; sourceTree = "<group>"; };
+		B83F3EAA2125F2E600A2D20F /* SummerEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SummerEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B83F3EAC2125F2E600A2D20F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B83F3EAE2125F2E600A2D20F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		B83F3EB02125F2E700A2D20F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B83F3EB32125F2E700A2D20F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		B83F3EB52125F2E700A2D20F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B83F3EB62125F2E700A2D20F /* SummerEditor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SummerEditor.entitlements; sourceTree = "<group>"; };
+		B83F3EC12125F34C00A2D20F /* AndaleMono.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AndaleMono.png; sourceTree = "<group>"; };
+		B83F3ECA2126021D00A2D20F /* SummerEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerEntry.swift; sourceTree = "<group>"; };
+		B83F3ECD2127745500A2D20F /* SummerResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerResource.swift; sourceTree = "<group>"; };
+		B83F3ECF212774AE00A2D20F /* SummerResourceList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerResourceList.swift; sourceTree = "<group>"; };
 		B845A89420E09F6C000904D3 /* SummerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerView.swift; sourceTree = "<group>"; };
 		B84DEE7520F7E3AD00D397A8 /* SummerMapTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerMapTest.swift; sourceTree = "<group>"; };
 		B87612A02104FFC600235E8E /* SummerParticles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerParticles.swift; sourceTree = "<group>"; };
-		B8820ECD2117D05B001EB398 /* AndaleMonoSmall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AndaleMonoSmall.png; path = ../../../../AndaleMonoSmall.png; sourceTree = "<group>"; };
+		B8820ECD2117D05B001EB398 /* AndaleMono.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AndaleMono.png; path = ../../../../AndaleMono.png; sourceTree = "<group>"; };
+		B8A4AD32212B5B2800BB3484 /* Box.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
+		B8A4AD34212B5C4900BB3484 /* SummerColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerColor.swift; sourceTree = "<group>"; };
+		B8A8066C2129CBA700192B3D /* myguy1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = myguy1.png; sourceTree = "<group>"; };
 		B8B02DFA20F0FD6600951616 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		B8B02E1220F1481000951616 /* SummerTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerTransform.swift; sourceTree = "<group>"; };
 		B8C3D322211DEED700718428 /* AndaleMonoFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AndaleMonoFont.swift; sourceTree = "<group>"; };
@@ -121,7 +161,6 @@
 		B8D25B0720E52DAF005EFF90 /* SummerMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerMessage.swift; sourceTree = "<group>"; };
 		B8D901A221150C0000CAA59F /* Editor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor.swift; sourceTree = "<group>"; };
 		B8D901A421150C1800CAA59F /* MonoFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonoFont.swift; sourceTree = "<group>"; };
-		B8D901A621150C5300CAA59F /* AndaleMono.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AndaleMono.png; path = ../../../../AndaleMono.png; sourceTree = "<group>"; };
 		B8D9588620F5133600ED5BE7 /* SummerFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerFeatures.swift; sourceTree = "<group>"; };
 		B8E9C4FC20E01CC800BA74A9 /* Summer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Summer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8E9C4FF20E01CC900BA74A9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -138,6 +177,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B83F3EA72125F2E600A2D20F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B83F3EBE2125F31A00A2D20F /* SummerEngine.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B8E9C4F920E01CC800BA74A9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -159,8 +206,7 @@
 		B80559D420EA68DC00F7B749 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				B8D901A621150C5300CAA59F /* AndaleMono.png */,
-				B8820ECD2117D05B001EB398 /* AndaleMonoSmall.png */,
+				B8820ECD2117D05B001EB398 /* AndaleMono.png */,
 				B824C8C1210BC4EA00562919 /* circle.png */,
 				B808E98D20FEAF2A004A9A34 /* myguy1.png */,
 				B808E98E20FEAF2A004A9A34 /* myguy2.png */,
@@ -212,17 +258,21 @@
 			children = (
 				B8D9588620F5133600ED5BE7 /* SummerFeatures.swift */,
 				B8098F3A20E2805A008A180B /* SummerSettings.swift */,
+				B83F3ECF212774AE00A2D20F /* SummerResourceList.swift */,
+				B8A4AD34212B5C4900BB3484 /* SummerColor.swift */,
 			);
 			path = Structs;
 			sourceTree = "<group>";
 		};
-		B80C2E3620F599A9007E8647 /* Interfaces */ = {
+		B80C2E3620F599A9007E8647 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
 				B8098F3820E2805A008A180B /* SummerProgram.swift */,
+				B83F3ECA2126021D00A2D20F /* SummerEntry.swift */,
+				B83F3ECD2127745500A2D20F /* SummerResource.swift */,
 				B845A89420E09F6C000904D3 /* SummerView.swift */,
 			);
-			path = Interfaces;
+			path = Protocols;
 			sourceTree = "<group>";
 		};
 		B824C8C6210C26CE00562919 /* SummerShaders */ = {
@@ -233,9 +283,45 @@
 			path = SummerShaders;
 			sourceTree = "<group>";
 		};
+		B83F3EAB2125F2E600A2D20F /* SummerEditor */ = {
+			isa = PBXGroup;
+			children = (
+				B83F3EC02125F34400A2D20F /* Resources */,
+				B83F3ECC2126060600A2D20F /* Tools */,
+				B8D901A221150C0000CAA59F /* Editor.swift */,
+				B83F3EAE2125F2E600A2D20F /* ViewController.swift */,
+				B83F3EB02125F2E700A2D20F /* Assets.xcassets */,
+				B83F3EB22125F2E700A2D20F /* Main.storyboard */,
+				B83F3EB52125F2E700A2D20F /* Info.plist */,
+				B83F3EB62125F2E700A2D20F /* SummerEditor.entitlements */,
+				B83F3EAC2125F2E600A2D20F /* AppDelegate.swift */,
+			);
+			path = SummerEditor;
+			sourceTree = "<group>";
+		};
+		B83F3EC02125F34400A2D20F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B8A8066C2129CBA700192B3D /* myguy1.png */,
+				B83F3EC12125F34C00A2D20F /* AndaleMono.png */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		B83F3ECC2126060600A2D20F /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				B8D901A421150C1800CAA59F /* MonoFont.swift */,
+				B8C3D322211DEED700718428 /* AndaleMonoFont.swift */,
+				B8A4AD32212B5B2800BB3484 /* Box.swift */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
 		B8E9C4F320E01CC800BA74A9 = {
 			isa = PBXGroup;
 			children = (
+				B83F3EAB2125F2E600A2D20F /* SummerEditor */,
 				B8E9C4FE20E01CC800BA74A9 /* Summer */,
 				B8E9C52020E0200900BA74A9 /* SummerEngine */,
 				B824C8C6210C26CE00562919 /* SummerShaders */,
@@ -250,6 +336,7 @@
 				B8E9C4FC20E01CC800BA74A9 /* Summer.app */,
 				B8E9C51F20E0200900BA74A9 /* SummerEngine.framework */,
 				B824C8C5210C26CE00562919 /* SummerShaders.metallib */,
+				B83F3EAA2125F2E600A2D20F /* SummerEditor.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -268,9 +355,6 @@
 				B8E9C50520E01CCA00BA74A9 /* Main.storyboard */,
 				B8E9C50820E01CCA00BA74A9 /* Info.plist */,
 				B8E9C50920E01CCA00BA74A9 /* Summer.entitlements */,
-				B8D901A421150C1800CAA59F /* MonoFont.swift */,
-				B8C3D322211DEED700718428 /* AndaleMonoFont.swift */,
-				B8D901A221150C0000CAA59F /* Editor.swift */,
 			);
 			path = Summer;
 			sourceTree = "<group>";
@@ -294,7 +378,7 @@
 				B80C2E3320F5993F007E8647 /* Objects */,
 				B80C2E3420F5995E007E8647 /* Enums */,
 				B80C2E3520F5997A007E8647 /* Structs */,
-				B80C2E3620F599A9007E8647 /* Interfaces */,
+				B80C2E3620F599A9007E8647 /* Protocols */,
 				B8E9C52220E0200900BA74A9 /* Info.plist */,
 			);
 			path = SummerEngine;
@@ -327,6 +411,25 @@
 			productName = SummerShaders;
 			productReference = B824C8C5210C26CE00562919 /* SummerShaders.metallib */;
 			productType = "com.apple.product-type.metal-library";
+		};
+		B83F3EA92125F2E600A2D20F /* SummerEditor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B83F3EB72125F2E700A2D20F /* Build configuration list for PBXNativeTarget "SummerEditor" */;
+			buildPhases = (
+				B83F3EA62125F2E600A2D20F /* Sources */,
+				B83F3EA72125F2E600A2D20F /* Frameworks */,
+				B83F3EA82125F2E600A2D20F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B83F3EBD2125F2FD00A2D20F /* PBXTargetDependency */,
+				B83F3EBB2125F2F700A2D20F /* PBXTargetDependency */,
+			);
+			name = SummerEditor;
+			productName = SummerEditor;
+			productReference = B83F3EAA2125F2E600A2D20F /* SummerEditor.app */;
+			productType = "com.apple.product-type.application";
 		};
 		B8E9C4FB20E01CC800BA74A9 /* Summer */ = {
 			isa = PBXNativeTarget;
@@ -379,6 +482,9 @@
 					B824C8C4210C26CE00562919 = {
 						CreatedOnToolsVersion = 10.0;
 					};
+					B83F3EA92125F2E600A2D20F = {
+						CreatedOnToolsVersion = 10.0;
+					};
 					B8E9C4FB20E01CC800BA74A9 = {
 						CreatedOnToolsVersion = 10.0;
 						SystemCapabilities = {
@@ -412,11 +518,24 @@
 				B8E9C4FB20E01CC800BA74A9 /* Summer */,
 				B8E9C51E20E0200900BA74A9 /* SummerEngine */,
 				B824C8C4210C26CE00562919 /* SummerShaders */,
+				B83F3EA92125F2E600A2D20F /* SummerEditor */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B83F3EA82125F2E600A2D20F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B83F3EC52125FB6D00A2D20F /* AndaleMono.png in Resources */,
+				B83F3EBF2125F33B00A2D20F /* SummerShaders.metallib in Resources */,
+				B83F3EB12125F2E700A2D20F /* Assets.xcassets in Resources */,
+				B83F3EB42125F2E700A2D20F /* Main.storyboard in Resources */,
+				B8A8066D2129CBA700192B3D /* myguy1.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B8E9C4FA20E01CC800BA74A9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -424,12 +543,11 @@
 				B824C8CF210C2DBA00562919 /* SummerShaders.metallib in Resources */,
 				B808E99120FEAF2A004A9A34 /* myguy2.png in Resources */,
 				B80559D620EA68E700F7B749 /* fourty.png in Resources */,
-				B8820ECE2117D05B001EB398 /* AndaleMonoSmall.png in Resources */,
+				B8820ECE2117D05B001EB398 /* AndaleMono.png in Resources */,
 				B808E99020FEAF2A004A9A34 /* myguy1.png in Resources */,
 				B808E98B20FEAF1E004A9A34 /* thousand.png in Resources */,
 				B8E9C50420E01CCA00BA74A9 /* Assets.xcassets in Resources */,
 				B8E9C50720E01CCA00BA74A9 /* Main.storyboard in Resources */,
-				B8D901A721150C5300CAA59F /* AndaleMono.png in Resources */,
 				B808E98920FEAF1E004A9A34 /* heroes.png in Resources */,
 				B824C8C2210BC4EB00562919 /* circle.png in Resources */,
 				B808E98F20FEAF2A004A9A34 /* myguy3.png in Resources */,
@@ -455,19 +573,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B83F3EA62125F2E600A2D20F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B83F3EAF2125F2E600A2D20F /* ViewController.swift in Sources */,
+				B8A4AD33212B5B2800BB3484 /* Box.swift in Sources */,
+				B83F3EC32125F35F00A2D20F /* MonoFont.swift in Sources */,
+				B83F3EAD2125F2E600A2D20F /* AppDelegate.swift in Sources */,
+				B83F3EC22125F35F00A2D20F /* AndaleMonoFont.swift in Sources */,
+				B83F3EC42125F35F00A2D20F /* Editor.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B8E9C4F820E01CC800BA74A9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B8D901A321150C0000CAA59F /* Editor.swift in Sources */,
-				B8D901A521150C1800CAA59F /* MonoFont.swift in Sources */,
 				B84DEE7620F7E3AD00D397A8 /* SummerMapTest.swift in Sources */,
 				B8FC4E7420FA876100F807C1 /* SummerAnimTest.swift in Sources */,
 				B8098F3320E28045008A180B /* SummerGame.swift in Sources */,
 				B8098F3520E28045008A180B /* SummerController.swift in Sources */,
 				B8E9C50020E01CC900BA74A9 /* AppDelegate.swift in Sources */,
 				B87612A12104FFC600235E8E /* SummerParticles.swift in Sources */,
-				B8C3D323211DEED700718428 /* AndaleMonoFont.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -481,6 +609,8 @@
 				B824C8C0210BB8F000562919 /* Queue.swift in Sources */,
 				B8098F3E20E2805A008A180B /* SummerTexture.swift in Sources */,
 				B8098F3C20E2805A008A180B /* SummerEngine.swift in Sources */,
+				B8A4AD35212B5C4900BB3484 /* SummerColor.swift in Sources */,
+				B83F3ECE2127745500A2D20F /* SummerResource.swift in Sources */,
 				B845A89520E09F6C000904D3 /* SummerView.swift in Sources */,
 				B8FC4E7220FA836100F807C1 /* SummerAnimation.swift in Sources */,
 				B8D25B0820E52DAF005EFF90 /* SummerMessage.swift in Sources */,
@@ -490,10 +620,12 @@
 				B8D9588720F5133600ED5BE7 /* SummerFeatures.swift in Sources */,
 				B8C57E6020F70364007F06DC /* SummerData.swift in Sources */,
 				B8B02E1320F1481000951616 /* SummerTransform.swift in Sources */,
+				B83F3ED0212774AE00A2D20F /* SummerResourceList.swift in Sources */,
 				B8098F3B20E2805A008A180B /* SummerObject.swift in Sources */,
 				B8C57E5E20F6E876007F06DC /* SummerTileset.swift in Sources */,
 				B8098F3F20E2805A008A180B /* SummerSettings.swift in Sources */,
 				B8098F3D20E2805A008A180B /* SummerProgram.swift in Sources */,
+				B83F3ECB2126021D00A2D20F /* SummerEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -505,6 +637,16 @@
 			target = B824C8C4210C26CE00562919 /* SummerShaders */;
 			targetProxy = B824C8CC210C2CC400562919 /* PBXContainerItemProxy */;
 		};
+		B83F3EBB2125F2F700A2D20F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B8E9C51E20E0200900BA74A9 /* SummerEngine */;
+			targetProxy = B83F3EBA2125F2F700A2D20F /* PBXContainerItemProxy */;
+		};
+		B83F3EBD2125F2FD00A2D20F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B824C8C4210C26CE00562919 /* SummerShaders */;
+			targetProxy = B83F3EBC2125F2FD00A2D20F /* PBXContainerItemProxy */;
+		};
 		B8E9C52520E0200900BA74A9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B8E9C51E20E0200900BA74A9 /* SummerEngine */;
@@ -513,6 +655,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		B83F3EB22125F2E700A2D20F /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B83F3EB32125F2E700A2D20F /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 		B8E9C50520E01CCA00BA74A9 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -543,6 +693,48 @@
 				DEVELOPMENT_TEAM = 29ZQB5VV8B;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		B83F3EB82125F2E700A2D20F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SummerEditor/SummerEditor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 29ZQB5VV8B;
+				INFOPLIST_FILE = SummerEditor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = Volta.SummerEditor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		B83F3EB92125F2E700A2D20F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SummerEditor/SummerEditor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 29ZQB5VV8B;
+				INFOPLIST_FILE = SummerEditor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = Volta.SummerEditor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -771,6 +963,15 @@
 			buildConfigurations = (
 				B824C8CA210C26CE00562919 /* Debug */,
 				B824C8CB210C26CE00562919 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B83F3EB72125F2E700A2D20F /* Build configuration list for PBXNativeTarget "SummerEditor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B83F3EB82125F2E700A2D20F /* Debug */,
+				B83F3EB92125F2E700A2D20F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

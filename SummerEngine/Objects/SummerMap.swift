@@ -10,18 +10,18 @@ import Foundation
 import Metal
 
 /// Allows for drawing repitive patterns with much less memory.
-public class SummerMap {
+public class SummerMap: SummerResource {
     internal static let metadataSize = MemoryLayout<UInt32>.size * 10
     
     private let parent: SummerEngine
     
     private let buffer: MTLBuffer!
-    private let width, height: Int
-    private let unitX, unitY: Float
-    private let final : Bool
+    public let width, height: Int
+    public let unitX, unitY: Float
+    public let final : Bool
     
     private var _tileset: SummerTileset
-    /// The used tileset.
+    /// The map tileset.
     public var tileset: SummerTileset {
         get { return _tileset }
         set {
@@ -32,8 +32,11 @@ public class SummerMap {
             }
         }
     }
-    /// The used transform.
+    
+    /// The map transform.
     public var transform: SummerTransform
+    
+    public var filter: SummerFilter
     
     private func remakeMetadata() {
         if final { return }
@@ -68,6 +71,8 @@ public class SummerMap {
         
         return indexFind
     }
+    
+    public func resourceList() -> SummerResourceList { return SummerResourceList(transforms: [transform]) }
     
     /// Activates the map. The map will now be drawn.
     public func setActive() {
@@ -142,12 +147,18 @@ public class SummerMap {
                   unitX: Float, unitY: Float,
                   final: Bool = false) {
         self.parent = parent
+        
         self.width = width
         self.height = height
+        
         self._tileset = tileset
         self.transform = transform
+        
         self.unitX = unitX
         self.unitY = unitY
+        
+        self.filter = parent.settings.mapFilter
+        
         self.final = final
         
         var metadata = [

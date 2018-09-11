@@ -9,7 +9,7 @@
 import Foundation
 
 /// Customizable animation for objects.
-public class SummerAnimation: NSObject {
+public class SummerAnimation {
     private let parent: SummerEngine
     
     private let textures: [SummerTexture]
@@ -18,9 +18,10 @@ public class SummerAnimation: NSObject {
     private var timer: Timer!
     private var tick: Int
     
+    /// The time that each frame is displayed, in seconds.
     public let animationRate: Double
     
-    /// Returns the texture this animation is currently displaying.
+    /// The texture that is currently being displayed.
     public var currentTexture: SummerTexture {
         get { return textures[tick % textures.count] }
     }
@@ -41,7 +42,7 @@ public class SummerAnimation: NSObject {
         timer = Timer.scheduledTimer(withTimeInterval: rate, repeats: true, block: callStep)
     }
     
-    /// Adds an object to be animated.
+    /// Animates another object.
     ///
     /// - Parameter object: The object to be animated.
     public func addObject(_ object: SummerObject) {
@@ -51,7 +52,7 @@ public class SummerAnimation: NSObject {
         objects.append(object)
     }
     
-    /// Removes an object. The object will no longer be animated.
+    /// Stops animating an object.
     ///
     /// - Parameter object: The object to be removed.
     public func removeObject(_ object: SummerObject) {
@@ -79,8 +80,6 @@ public class SummerAnimation: NSObject {
         if textures.count < 1 { self.textures = [parent.makeNilTexture()] }
         else { self.textures = textures }
         
-        super.init()
-        
-        timer = Timer.scheduledTimer(withTimeInterval: animationRate, repeats: true) { _ in self.step() }
+        timer = Timer.scheduledTimer(withTimeInterval: animationRate, repeats: true, block: callStep)
     }
 }

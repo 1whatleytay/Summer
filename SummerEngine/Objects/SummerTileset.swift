@@ -52,14 +52,24 @@ public class SummerTileset {
             return (tileWidths: tileWidths, tileHeights: tileHeights, data: data)
     }
     
+    public static func convert(data: [[Float]]) -> [[UInt8]] {
+        var subdata = [[UInt8]](repeating: [UInt8](), count: data.count)
+        
+        for i in 0 ..< data.count {
+            subdata[i] = SummerTexture.convert(data: data[i])
+        }
+        
+        return subdata
+    }
+    
     /// Edits a region of a tile.
     ///
     /// - Parameters:
     ///   - tileIndex: The index of the tile.
-    ///   - x: The x coordinate in the tile to be replaced.
-    ///   - y: The y coordinate in the tile to be replaced.
-    ///   - replaceWidth: The width of the replacement.
-    ///   - replaceHeight: The height of the replacement.
+    ///   - x: The x coordinate of the region in the tile to be replaced.
+    ///   - y: The y coordinate of the region in the tile to be replaced.
+    ///   - replaceWidth: The width of the region.
+    ///   - replaceHeight: The height of the region.
     ///   - data: The data to replace the region.
     public func editTile(tileIndex: Int, x: Int, y: Int, replaceWidth: Int, replaceHeight: Int, data: [UInt8]) {
         if tileIndex < 0 || x < 0 || y < 0 || replaceWidth < 0 || replaceHeight < 0 { return }
@@ -70,6 +80,23 @@ public class SummerTileset {
         
         texture.replace(region: MTLRegionMake2D(tileX + x, tileY + y, replaceWidth, replaceHeight), mipmapLevel: 0, withBytes: data, bytesPerRow: replaceWidth * 4)
     }
+    
+    /// Edits a region of a tile.
+    ///
+    /// - Parameters:
+    ///   - tileIndex: The index of the tile.
+    ///   - x: The x coordinate of the region in the tile to be replaced.
+    ///   - y: The y coordinate of the region in the tile to be replaced.
+    ///   - replaceWidth: The width of the region.
+    ///   - replaceHeight: The height of the region.
+    ///   - data: The data to replace the region.
+    public func editTile(tileIndex: Int, x: Int, y: Int, replaceWidth: Int, replaceHeight: Int, data: [Float]) {
+        editTile(tileIndex: tileIndex,
+                 x: x, y: y,
+                 replaceWidth: replaceWidth, replaceHeight: replaceHeight,
+                 data: SummerTexture.convert(data: data))
+    }
+    
     
     /// Replaces an entire tile.
     ///
@@ -84,6 +111,15 @@ public class SummerTileset {
         
         texture.replace(region: MTLRegionMake2D(tileX, tileY, tileWidth, tileHeight),
                         mipmapLevel: 0, withBytes: data, bytesPerRow: tileWidth * 4)
+    }
+    
+    /// Replaces an entire tile.
+    ///
+    /// - Parameters:
+    ///   - tileIndex: The index of the tile.
+    ///   - data: The data to replace the tile.
+    public func setTile(tileIndex: Int, data: [Float]) {
+        setTile(tileIndex: tileIndex, data: SummerTexture.convert(data: data))
     }
     
     internal init(_ parent: SummerEngine, tileWidth: Int, tileHeight: Int, data: [[UInt8]], alloc: Int = 0) {

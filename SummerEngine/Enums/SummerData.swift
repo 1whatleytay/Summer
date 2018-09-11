@@ -14,3 +14,8 @@ public enum SummerFileLocation {
     case folder
     case bundle
 }
+
+public enum SummerFilter {
+    case linear
+    case nearest
+}

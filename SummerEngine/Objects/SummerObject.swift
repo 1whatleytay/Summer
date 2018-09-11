@@ -42,6 +42,10 @@ open class SummerObject {
         }
     }
     
+    public func say() {
+        print("\(objectId): " + objectData().description)
+    }
+    
     private var _isVisible: Bool
     /// If true, the object will be drawn to the screen. Use show() and hide() to manipulate this value.
     public var isVisible: Bool {
@@ -51,8 +55,6 @@ open class SummerObject {
             else { hide() }
         }
     }
-    /// If true, this object will be deleted when the engine is low on memory.
-    public private(set) var isDisposable = false
     
     private var _draw: SummerDraw
     /// The draw this object belongs to.
@@ -77,6 +79,9 @@ open class SummerObject {
         }
     }
     
+    /// If true, this object will be deleted when the engine is low on memory.
+    public private(set) var isDisposable = false
+    
     internal static func allocate(_ parent: SummerEngine) -> Int {
         var indexFind = -1
         for i in 0 ..< parent.objectAllocationData.count {
@@ -91,9 +96,7 @@ open class SummerObject {
     
     internal func allocate() {
         if objectId == -1 { return }
-        if parent.settings.debugPrintAllocationMessages {
-            print("Allocate Object: \(objectId)")
-        }
+        
         parent.objectAllocationData[objectId] = true
     }
     
@@ -113,8 +116,7 @@ open class SummerObject {
         ]
     }
     
-    /// Saves all changes to this object.
-    public func save() {
+    private func save(data: [Float]) {
         if objectId == -1 { return }
         
         let start = objectId * SummerObject.size
@@ -126,6 +128,9 @@ open class SummerObject {
         
         parent.objectBuffer.didModifyRange(start ..< end)
     }
+    
+    /// Saves all changes to this object.
+    public func save() { save(data: objectData()) }
     
     /// Marks this object as changed. This object will be saved.
     public func commit() {
@@ -142,7 +147,7 @@ open class SummerObject {
     public func setDisposable() {
         if !isDisposable {
             isDisposable = true
-            parent.objectDisposables.enqueue(self)
+            parent.disposables.enqueue(self)
         }
     }
     
@@ -258,7 +263,7 @@ open class SummerObject {
         }
     }
     
-    /// Creates a new identical object.
+    /// Creates a new object with the same properties.
     ///
     /// - Returns: A duplicate object.
     public func duplicate() -> SummerObject {
@@ -277,6 +282,8 @@ open class SummerObject {
         
         _draw.removeIndex(index: objectId)
         parent.objectAllocationData[objectId] = false
+        
+        if parent.settings.clearDeletedMemory { save(data: [Float](repeating: 0, count: SummerObject.vertices)) }
     }
     
     deinit { if deleteOnDealloc { delete() } }
@@ -306,9 +313,7 @@ open class SummerObject {
         var objectId = SummerObject.allocate(parent)
         
         if objectId == -1 {
-            let success = parent.clearObjectSpace()
-            
-            if success { objectId = SummerObject.allocate(parent) }
+            if parent.hasMoreObjectSpace() { objectId = SummerObject.allocate(parent) }
             else { parent.settings.messageHandler?(.outOfObjectMemory) }
         }
         

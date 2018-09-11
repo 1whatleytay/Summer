@@ -9,12 +9,14 @@
 import Foundation
 import SummerEngine
 
-class MonoFontText {
+class MonoFontText: SummerResource {
     private let parent: MonoFont
     private let engine: SummerEngine
     
     private var textObjects: [SummerObject?]
     private let charWidth, charHeight: Float
+    
+    public var x, y: Float
     
     private var _transform: SummerTransform
     public var transform: SummerTransform {
@@ -23,8 +25,34 @@ class MonoFontText {
             for object in textObjects {
                 object?.transform = newValue
             }
+            _transform = newValue
         }
     }
+    
+    private var _draw: SummerDraw
+    public var draw: SummerDraw {
+        get { return _draw }
+        set {
+            for object in textObjects {
+                object?.draw = newValue
+            }
+            _draw = newValue
+        }
+    }
+    
+    private var _text: String
+    public var text: String {
+        get { return _text }
+        set {
+            delete()
+            
+            if text.count > textObjects.count { textObjects.reserveCapacity(text.count) }
+            
+            save()
+        }
+    }
+    
+    func resourceList() -> SummerResourceList { return SummerResourceList(objects: textObjects) }
     
     @discardableResult public func makeTransform() -> SummerTransform {
         transform = engine.makeTransform()
@@ -38,6 +66,32 @@ class MonoFontText {
         return self
     }
     
+    public func move(x: Float, y: Float) {
+        self.x += x
+        self.y += y
+        
+        save()
+    }
+    
+    public func put(x: Float, y: Float) {
+        self.x += x
+        self.y += y
+        
+        save()
+    }
+    
+    public func save() {
+        for i in 0 ..< text.count {
+            textObjects[i] = _draw.makeObject(x: x + charWidth * Float(i), y: y,
+                                               width: charWidth, height: charHeight,
+                                               texture: parent.characters[
+                                                parent.idFunc(
+                                                    text[text.index(
+                                                        text.startIndex, offsetBy: i)])])
+                .withTransform(_transform)
+        }
+    }
+    
     public func delete() {
         for object in textObjects {
             object?.delete()
@@ -48,7 +102,13 @@ class MonoFontText {
         self.parent = parent
         self.engine = parent.parent
         
-        self._transform = engine.globalTransform
+        self.x = x
+        self.y = y
+        self._text = text
+        self._transform = engine.makeTransform()
+        self._draw = engine.makeDraw()
+        
+        _draw.filter = .linear
         
         textObjects = [SummerObject?](repeating: nil, count: text.count + alloc)
         
@@ -57,19 +117,11 @@ class MonoFontText {
         charWidth = Float(parent.charWidth) / peri * scale
         charHeight = Float(parent.charHeight) / peri * scale
         
-        for i in 0 ..< text.count {
-            textObjects[i] = engine.makeObject(x: x + charWidth * Float(i), y: y,
-                                                      width: charWidth, height: charHeight,
-                                                      texture: parent.characters[
-                                                        parent.idFunc(
-                                                            text[text.index(
-                                                                text.startIndex, offsetBy: i)])])
-        }
-        self._transform = engine.globalTransform
+        save()
     }
 }
 
-class MonoFont {
+class MonoFont: SummerResource {
     fileprivate let parent: SummerEngine
     
     public let texture: SummerTexture
@@ -78,9 +130,13 @@ class MonoFont {
     fileprivate let idFunc: (Character) -> Int
     fileprivate let charWidth, charHeight: Int
     
+    func resourceList() -> SummerResourceList { return SummerResourceList(textures: [texture]) }
+    
     public func makeText(text: String, x: Float, y: Float, scale: Float = 1, alloc: Int = 0) -> MonoFontText {
         return MonoFontText(self, text: text, x: x, y: y, scale: scale, alloc: alloc)
     }
+    
+    public func delete() { texture.delete() }
     
     public init?(_ parent: SummerEngine,
                  fromFile file: String,
@@ -98,7 +154,7 @@ class MonoFont {
         
         for x in 0 ..< gridWidth {
             for y in 0 ..< gridHeight {
-                characters[x + y * gridWidth] = texture.sample(x: charWidth * x, y: charHeight * y, width: charWidth, height: charHeight)!
+                characters[x + y * gridWidth] = texture.sample(x: charWidth * x, y: charHeight * y, width: charWidth, height: charHeight)
             }
         }
     }

@@ -52,13 +52,17 @@ fragment float4 textureShader(VertexOut vert [[stage_in]],
     return sample;
 }
 
-constant VertexOut vertexTypes[] = {
-    { float4(0, 0, 0, 1), float2(0, 0) },
-    { float4(1, 0, 0, 1), float2(1, 0) },
-    { float4(0, 1, 0, 1), float2(0, 1) },
-    { float4(1, 0, 0, 1), float2(1, 0) },
-    { float4(0, 1, 0, 1), float2(0, 1) },
-    { float4(1, 1, 0, 1), float2(1, 1) }
+fragment float4 redColor() {
+    return float4(1, 0, 0, 1);
+}
+
+constant float2 vTypes[] = {
+    {0, 0},
+    {1, 0},
+    {0, 1},
+    {1, 0},
+    {0, 1},
+    {1, 1}
 };
 
 struct MapMetadata {
@@ -86,28 +90,28 @@ vertex VertexOut mapVertexShader(uint vertexId [[vertex_id]],
     uint tileData = mapData[tileId];
     uint tileX = tileId % meta.mapWidth, tileY = tileId / meta.mapWidth;
     uint tilesetX = tileData % meta.tilesX, tilesetY = tileData / meta.tilesX;
+//
+    float tileUnitX = meta.tileWidth / (float)meta.tilesetWidth, tileUnitY = meta.tileHeight / (float)meta.tilesetHeight;
     
-    float tileUnitX = meta.tileWidth / (float)meta.tilesetWidth;
-    float tileUnitY = meta.tileHeight / (float)meta.tilesetHeight;
-    
-    // Get a vertex location from the `vertexTypes` array.
-    VertexOut vert = vertexTypes[vertexType];
+    // Get a vertex location from the `vTypes` array.
+    VertexOut vOut;
+    vOut.position = float4(vTypes[vertexType], 0, 1);
     
     // Adjust the tile location.
-    vert.position.x = (vert.position.x + tileX) * meta.unitX * 2 - 1;
-    vert.position.y = -((vert.position.y + tileY) * meta.unitY * 2 - 1);
+    vOut.position.x = (vOut.position.x + tileX) * meta.unitX * 2 - 1;
+    vOut.position.y = -((vOut.position.y + tileY) * meta.unitY * 2 - 1);
     
     // Apply transform.
-    float2 newPos = t.matrix * (vert.position.xy - t.origin) + t.origin + t.offset;
-    
-    vert.position.x = newPos.x;
-    vert.position.y = newPos.y;
+    float2 newPos = t.matrix * (vOut.position.xy - t.origin) + t.origin + t.offset;
+//
+    vOut.position.x = newPos.x;
+    vOut.position.y = newPos.y;
     
     // Calculate texture location.
-    vert.texCoord.x = (vert.texCoord.x + tilesetX) * tileUnitX;
-    vert.texCoord.y = (vert.texCoord.y + tilesetY) * tileUnitY;
+    vOut.texCoord.x = (vTypes[vertexType].x + tilesetX) * tileUnitX;
+    vOut.texCoord.y = (vTypes[vertexType].y + tilesetY) * tileUnitY;
     
-    vert.opacity = t.opacity;
+    vOut.opacity = t.opacity;
     
-    return vert;
+    return vOut;
 }

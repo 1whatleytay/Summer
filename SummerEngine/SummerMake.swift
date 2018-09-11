@@ -17,11 +17,10 @@ extension SummerEngine {
     ///   - texture: The texture of the object.
     ///   - isVisible: If false, the object will not be shown by default.
     /// - Returns: A summer object.
-    public func makeObject(
-        x: Float, y: Float,
-        width: Float, height: Float,
-        texture: SummerTexture,
-        isVisible: Bool = true) -> SummerObject {
+    public func makeObject(x: Float, y: Float,
+                           width: Float, height: Float,
+                           texture: SummerTexture,
+                           isVisible: Bool = true) -> SummerObject {
         return SummerObject(self,
                             draw: defaultObjectDraw,
                             transform: defaultObjectTransform,
@@ -41,11 +40,10 @@ extension SummerEngine {
     ///   - animation: The animation that will animate the object.
     ///   - isVisible: If false, the object will not be shown by default.
     /// - Returns: A summer object.
-    public func makeObject(
-        x: Float, y: Float,
-        width: Float, height: Float,
-        animation: SummerAnimation,
-        isVisible: Bool = true) -> SummerObject {
+    public func makeObject(x: Float, y: Float,
+                           width: Float, height: Float,
+                           animation: SummerAnimation,
+                           isVisible: Bool = true) -> SummerObject {
         let obj = makeObject(x: x, y: y,
                              width: width, height: height,
                              texture: animation.currentTexture,
@@ -71,10 +69,14 @@ extension SummerEngine {
         width: Float, height: Float,
         texture: SummerTexture,
         isVisible: Bool = true) -> SummerObject {
-        return makeObject(x: x, y: y,
-                          width: width, height: height,
-                          texture: texture,
-                          isVisible: isVisible)
+        return SummerObject(self,
+                            draw: defaultObjectDraw,
+                            transform: defaultObjectTransform,
+                            x: x, y: y,
+                            width: width, height: height,
+                            texture: texture,
+                            isVisible: isVisible,
+                            autoDelete: false)
             .withDisposable()
     }
     
@@ -93,10 +95,14 @@ extension SummerEngine {
         width: Float, height: Float,
         animation: SummerAnimation,
         isVisible: Bool = true) -> SummerObject {
-        let obj = makeObject(x: x, y: y,
-                             width: width, height: height,
-                             texture: animation.currentTexture,
-                             isVisible: isVisible)
+        let obj = SummerObject(self,
+                               draw: defaultObjectDraw,
+                               transform: defaultObjectTransform,
+                               x: x, y: y,
+                               width: width, height: height,
+                               texture: animation.currentTexture,
+                               isVisible: isVisible,
+                               autoDelete: false)
             .withDisposable()
         
         obj.animation = animation
@@ -182,12 +188,7 @@ extension SummerEngine {
     ///   - data: An array containing the RGBA components of each pixel.
     /// - Returns: A texture object.
     public func makeTexture(width: Int, height: Int, data: [Float]) -> SummerTexture {
-        var subdata = [UInt8](repeating: 0, count: data.count)
-        for i in 0 ..< data.count {
-            subdata[i] = UInt8(data[i] * 255)
-        }
-        
-        return makeTexture(width: width, height: height, data: subdata)
+        return makeTexture(width: width, height: height, data: SummerTexture.convert(data: data))
     }
     
     /// Makes a texture from an image file.
@@ -207,13 +208,13 @@ extension SummerEngine {
     /// Makes a texture from an image file.
     ///
     /// - Parameters:
-    ///   - file: The path to the file containing the image data.=
+    ///   - file: The path to the file containing the image data.
     /// - Returns: A texture object.
     public func makeTexture(fromFile file: String) -> SummerTexture? {
         return makeTexture(fromFile: file, in: settings.defaultTextureLocation)
     }
     
-    /// Makes a texture that represents a certain color.
+    /// Makes a texture that represents a color.
     ///
     /// - Parameters:
     ///   - red: The red component of the color.
@@ -223,6 +224,14 @@ extension SummerEngine {
     /// - Returns: A texture object.
     public func makeColor(red: Float, green: Float, blue: Float, alpha: Float) -> SummerTexture {
         return makeTexture(width: 1, height: 1, data: [red, green, blue, alpha])
+    }
+    
+    /// Makes a texture that represents a color.
+    ///
+    /// - Parameter color: The color of the texture.
+    /// - Returns: A texture object.
+    public func makeColor(_ color: SummerColor) -> SummerTexture {
+        return makeColor(red:Float(color.red), green: Float(color.blue), blue: Float(color.green), alpha: Float(color.alpha))
     }
     
     /// Makes a draw.
@@ -256,15 +265,9 @@ extension SummerEngine {
     ///   - alloc: The amount of extra space (in tiles) to allocate.
     /// - Returns: A tileset object.
     public func makeTileset(tileWidth: Int, tileHeight: Int, data: [[Float]], alloc: Int = 0) -> SummerTileset {
-        var subdata = [[UInt8]](repeating: [UInt8](repeating: 0, count: tileWidth * tileHeight * 4), count: data.count)
-        
-        for i in 0 ..< data.count {
-            for s in 0 ..< data[i].count {
-                subdata[i][s] = UInt8(data[i][s] * 255)
-            }
-        }
-        
-        return makeTileset(tileWidth: tileWidth, tileHeight: tileHeight, data: subdata, alloc: alloc)
+        return makeTileset(tileWidth: tileWidth, tileHeight: tileHeight,
+                           data: SummerTileset.convert(data: data),
+                           alloc: alloc)
     }
     
     /// Makes a tileset out the given files.
@@ -327,28 +330,6 @@ extension SummerEngine {
     ///   - height: The height of the map in tiles.
     ///   - data: An array of indices into the tileset. Each value is one tile in the map.
     ///   - tileset: A tileset containing images for each tile in the map.
-    ///   - transform: A transform for moving the map.
-    ///   - final: If true, the map will be constant.
-    /// - Returns: A map object.
-    public func makeMap(width: Int, height: Int,
-                        data: [UInt32],
-                        tileset: SummerTileset,
-                        transform: SummerTransform,
-                        final: Bool = false) -> SummerMap {
-        return makeMap(width: width, height: height, data: data,
-                       tileset: tileset, transform: transform,
-                       unitX: settings.horizontalUnit,
-                       unitY: settings.verticalUnit,
-                       final: final)
-    }
-    
-    /// Makes a map.
-    ///
-    /// - Parameters:
-    ///   - width: The width of the map in tiles.
-    ///   - height: The height of the map in tiles.
-    ///   - data: An array of indices into the tileset. Each value is one tile in the map.
-    ///   - tileset: A tileset containing images for each tile in the map.
     ///   - unitX: A fraction representing how much of the screen one tile should take horizontally.
     ///   - unitY: A fraction representing how much of the screen one tile should take vertically.
     ///   - final: If true, the map will be constant.
@@ -362,27 +343,6 @@ extension SummerEngine {
                        tileset: tileset,
                        transform: defaultMapTransform,
                        unitX: unitX, unitY: unitY,
-                       final: final)
-    }
-    
-    /// Makes a map.
-    ///
-    /// - Parameters:
-    ///   - width: The width of the map in tiles.
-    ///   - height: The height of the map in tiles.
-    ///   - data: An array of indices into the tileset. Each value is one tile in the map.
-    ///   - tileset: A tileset containing images for each tile in the map.
-    ///   - final: If true, the map will be constant.
-    /// - Returns: A map object.
-    public func makeMap(width: Int, height: Int,
-                        data: [UInt32],
-                        tileset: SummerTileset,
-                        final: Bool = false) -> SummerMap {
-        return makeMap(width: width, height: height, data: data,
-                       tileset: tileset,
-                       transform: defaultMapTransform,
-                       unitX: settings.horizontalUnit,
-                       unitY: settings.verticalUnit,
                        final: final)
     }
     
@@ -421,28 +381,6 @@ extension SummerEngine {
     ///   - height: The height of the map in tiles.
     ///   - data: An array of indices into the tileset. Each value is one tile in the map.
     ///   - tileset: A tileset containing images for each tile in the map.
-    ///   - transform: A transform for moving the map.
-    ///   - final: If true, the map will be constant.
-    /// - Returns: A map object.
-    public func makeMap(width: Int, height: Int,
-                        data: [Int],
-                        tileset: SummerTileset,
-                        transform: SummerTransform,
-                        final: Bool = false) -> SummerMap {
-        return makeMap(width: width, height: height, data: data,
-                       tileset: tileset, transform: transform,
-                       unitX: settings.horizontalUnit,
-                       unitY: settings.verticalUnit,
-                       final: final)
-    }
-    
-    /// Makes a map.
-    ///
-    /// - Parameters:
-    ///   - width: The width of the map in tiles.
-    ///   - height: The height of the map in tiles.
-    ///   - data: An array of indices into the tileset. Each value is one tile in the map.
-    ///   - tileset: A tileset containing images for each tile in the map.
     ///   - unitX: A fraction representing how much of the screen one tile should take horizontally.
     ///   - unitY: A fraction representing how much of the screen one tile should take vertically.
     ///   - final: If true, the map will be constant.
@@ -456,27 +394,6 @@ extension SummerEngine {
                        tileset: tileset,
                        transform: defaultMapTransform,
                        unitX: unitX, unitY: unitY,
-                       final: final)
-    }
-    
-    /// Makes a map.
-    ///
-    /// - Parameters:
-    ///   - width: The width of the map in tiles.
-    ///   - height: The height of the map in tiles.
-    ///   - data: An array of indices into the tileset. Each value is one tile in the map.
-    ///   - tileset: A tileset containing images for each tile in the map.
-    ///   - final: If true, the map will be constant.
-    /// - Returns: A map object.
-    public func makeMap(width: Int, height: Int,
-                        data: [Int],
-                        tileset: SummerTileset,
-                        final: Bool = false) -> SummerMap {
-        return makeMap(width: width, height: height, data: data,
-                       tileset: tileset,
-                       transform: defaultMapTransform,
-                       unitX: settings.horizontalUnit,
-                       unitY: settings.verticalUnit,
                        final: final)
     }
     

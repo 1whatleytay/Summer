@@ -22,19 +22,15 @@ class SummerMapTest: SummerProgram {
         
         engine.settings.messageHandler = { message in print(message) }
         
-        tileset = engine.makeTileset(tileWidth: 1, tileHeight: 1, data: [[1.0, 1.0, 1.0, 1.0]])
+        let data: [[Float]] = [[1, 1, 1, 1]]
+        tileset = engine.makeTileset(tileWidth: 1, tileHeight: 1, data: data)
         
-        let mapData = [
-            0, 0, 0, 1,
-            1, 1, 1, 2,
-            2, 0, 2, 0,
-            0, 1, 1, 2,
-        ]
+        let mapData = [ 0 ]
         
-        map = engine.makeMap(width: 4, height: 4,
+        map = engine.makeMap(width: 1, height: 1,
                              data: mapData,
                              tileset: tileset,
-                             unitX: 50/600, unitY: 50/600).withTransform()
+                             unitX: 1, unitY: 1).withTransform()
         
         myObject = engine.makeObject(x: 0, y: 0, width: 50, height: 50, texture: engine.makeTexture(fromFile: "fourty.png")!).withTransform(map.transform)
     }

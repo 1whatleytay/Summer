@@ -8,6 +8,7 @@
 
 import MetalKit
 
+/// Allows for input control over a view.
 public class SummerView: MTKView {
     private var engine: SummerEngine?
     

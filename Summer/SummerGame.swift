@@ -44,7 +44,7 @@ class SummerGame: SummerProgram {
         if state == .pressed {
             switch key {
             case .vkReturn:
-                engine.swapPrograms(SummerMenu(red), keepObjects: [red])
+                engine.swapPrograms(SummerMenu(red), keep: SummerResourceList(objects: [red]))
             case .vkL:
                 green.isVisible = !green.isVisible
             default:

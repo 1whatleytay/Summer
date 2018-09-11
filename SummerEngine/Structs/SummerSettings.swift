@@ -46,14 +46,19 @@ public struct SummerSettings {
     /// If true and a map is created it will be initialized with its own transform.
     public var autoMakeTranformWithMap = false
     
+    public var mapFilter = SummerFilter.nearest
+    
+    /// The color that will be used to clear the screen every frame.
+    public var clearColor = SummerColor(0, 0, 0)
+    
     /// If true, clears all memory allocated for commit() operations each frame. Memory may need to be reallocated.
     public var conserveModifyMemory = false
     
     /// If a location is not specified while creating a texture, this value will be used.
     public var defaultTextureLocation = SummerFileLocation.bundle
     
-    /// If true, SummerEngine will print allocation messages.
-    public var debugPrintAllocationMessages = false
+    /// Clears object/texture/transform memory once it has been marked as deleted.
+    public var clearDeletedMemory = false
     
     /// Handles messages like failures and warnings.
     public var messageHandler: ((SummerMessage) -> Void)? = nil
